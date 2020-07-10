@@ -1,5 +1,4 @@
 #Things Left
-# When a users leaves the server remove its entry from the dictionary
 
 
 import discord
@@ -62,7 +61,7 @@ async def on_message(message):
 
     elif str(message.content)[:5] == "!del ":      # To delete the number of messages specified
         await message.channel.purge(limit=min(125,int(str(message.content[5:]))))
-        await message.channel.send("Messages Deleted")
+        await message.channel.send(f"{min(125,int(str(message.content[5:])))} messages Deleted")
 
 
     elif str(message.content[:6]) == "!email":       # Add the emails of the members
@@ -103,7 +102,7 @@ async def on_message(message):
 
 @client.event
 async def on_member_remove(member):
-    
+
     var_a=str(member.name)
     for i in list(d.keys()):
         if var_a in d[i]:
@@ -116,4 +115,4 @@ async def on_member_remove(member):
 
 
 
-client.run("NzI5ODkzNTE5ODEyMTk4NTMw.XwPk_A.k__-5UzxeHi7PTosuMvZ6dWVM-k")
+client.run(token)
