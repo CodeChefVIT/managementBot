@@ -27,7 +27,11 @@ async def on_message(message):
     if "BOT" in str(message.author.name):
         pass
     elif "GitHub" in str(message.author.name):
-        pass
+        print("2",message.embeds)
+        for i in message.embeds:
+            print(i.title)
+            print(i.description)
+            print("@342343")
     else:
         if message.channel.name in d:
             if message.author.name in d[message.channel.name]:
@@ -90,7 +94,11 @@ async def on_message(message):
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
             subject = "An update was made to the git repository"
-            body = "An update was made to the git repository"
+            body = ""
+
+            for i in message.embeds:
+                body+=i.title+"\n\n"
+                body+=i.description+"\n\n\n\n"
 
             msg = f"Subject: {subject}\n\n{body}"
 
@@ -111,8 +119,7 @@ async def on_member_remove(member):
     for i in list(emails.keys()):
         if var_a in emails[i]:
             emails[i].pop(var_a)
-
-
+        
 
 
 client.run(token)
