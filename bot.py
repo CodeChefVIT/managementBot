@@ -1,4 +1,3 @@
-#Things Left
 
 
 import discord
@@ -9,8 +8,6 @@ import smtplib
 
 EMAIL_ADDRESS = userid
 EMAIL_PASSWORD = userpass
-
-#id=729892665390268467
 
 client = discord.Client()
 
@@ -23,16 +20,13 @@ async def on_message(message):
     id = client.get_guild(729892665390268467)
 
 
-    #counts the number of messages by each member
+    # Counts the number of messages by each member
     if "BOT" in str(message.author.name):
         pass
     elif "GitHub" in str(message.author.name):
-        print("2",message.embeds)
-        for i in message.embeds:
-            print(i.title)
-            print(i.description)
-            print("@342343")
+        pass
     else:
+
         if message.channel.name in d:
             if message.author.name in d[message.channel.name]:
                 d[message.channel.name][message.author.name]+=1
@@ -42,12 +36,6 @@ async def on_message(message):
             d[message.channel.name]=dict()
             d[message.channel.name][message.author.name]=1
 
-
-    if "BOT" in str(message.author.name):
-        pass
-    elif "GitHub" in str(message.author.name):
-        pass
-    else:
         if message.channel.name not in emails:
             emails[message.channel.name]=dict()
 
@@ -55,7 +43,7 @@ async def on_message(message):
     if message.content == "!users":                 # To find number of users in the channel 
         await message.channel.send(f"# of Members: {id.member_count}")
 
-    elif message.content == "!nummsg":              # To find number of messages sent by each users
+    elif message.content == "!msgcnt":              # To find number of messages sent by each users
         for i in d[message.channel.name]:
             await message.channel.send(f"{i}: {d[message.channel.name][i]}")
 
@@ -64,8 +52,8 @@ async def on_message(message):
 
 
     elif str(message.content)[:5] == "!del ":      # To delete the number of messages specified
-        await message.channel.purge(limit=min(125,int(str(message.content[5:]))))
-        await message.channel.send(f"{min(125,int(str(message.content[5:])))} messages Deleted")
+        await message.channel.purge(limit=min(100,int(str(message.content[5:]))))
+        await message.channel.send(f"{min(100,int(str(message.content[5:])))} messages Deleted")
 
 
     elif str(message.content[:6]) == "!email":       # Add the emails of the members
@@ -79,7 +67,7 @@ async def on_message(message):
         embed.add_field(name="!users",value="Returns the number of users in the channel")
         embed.add_field(name="!email <email id>",value="Sends an email when a pull request is made")
         embed.add_field(name="!del <int>",value="Deletes the specified number of messages")
-        embed.add_field(name="!nummsg",value="Returns the number of messages sent by each user")
+        embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
         embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
         await message.channel.send(content=None, embed=embed)
 
@@ -111,6 +99,7 @@ async def on_message(message):
 @client.event
 async def on_member_remove(member):
 
+    # To remove the member from the messages count and their email from the emails
     var_a=str(member.name)
     for i in list(d.keys()):
         if var_a in d[i]:
