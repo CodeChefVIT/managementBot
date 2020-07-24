@@ -13,6 +13,11 @@ client = discord.Client()
 
 d=dict()
 emails=dict()
+delete=dict()
+
+@client.event
+async def on_ready():
+    print(f'{client.user} has connected to Discord!')
 
 @client.event
 async def on_message(message):
@@ -32,12 +37,19 @@ async def on_message(message):
                 d[message.channel.name][message.author.name]+=1
             else:
                 d[message.channel.name][message.author.name]=1
+
+            delete[message.channel.name].append(message.id)
+
         else:
             d[message.channel.name]=dict()
             d[message.channel.name][message.author.name]=1
 
+            delete[message.channel.name]=list()
+            delete[message.channel.name].append(message.id)
+
         if message.channel.name not in emails:
             emails[message.channel.name]=dict()
+
 
 
     if message.content == "!users":                 # To find number of users in the channel 
@@ -49,6 +61,18 @@ async def on_message(message):
 
     elif message.content == "!rstcnt":             # To reset the count of messages of each user in a channel
         d[message.channel.name]=dict()
+
+    # Just for checking
+    elif message.content == "!delete":
+        #print(delete)
+        messages=await message.channel.fetch_message(delete[message.channel.name].pop(0))
+        #print(messages)
+        #a=delete[message.channel.name].pop(0)
+        #print(a)
+        #await message.delete(a)
+        #await message.channel.delete_messages(messages)
+        await messages.delete(delay=None)
+
 
 
     elif str(message.content)[:5] == "!del ":      # To delete the number of messages specified
@@ -99,7 +123,7 @@ async def on_message(message):
 @client.event
 async def on_member_remove(member):
 
-    # To remove the member from the messages count and their email from the emails
+    # To remove the member from the messages count and their email from the email
     var_a=str(member.name)
     for i in list(d.keys()):
         if var_a in d[i]:
