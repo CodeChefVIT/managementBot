@@ -52,7 +52,6 @@ async def on_message(message):
         pass
     else:
         
-
         cur.execute("SELECT channel, username, msgcnt, email from DISCORDBOT")
         rows = cur.fetchall()
         if(len(rows)):
@@ -69,9 +68,6 @@ async def on_message(message):
             cur.execute("INSERT INTO DISCORDBOT (channel,USERNAME,MSGCNT,EMAIL) VALUES (%s,%s,1,'Not Updated')", (str(message.channel.name), str(message.author.name)))
         conn.commit()
 
-
-
-    
     if message.content == "!users":                 # To find number of users in the channel 
         await message.channel.send(f"# of Members: {id.member_count}")
 
@@ -85,20 +81,7 @@ async def on_message(message):
         cur.execute("UPDATE DISCORDBOT set MSGCNT = 0 where CHANNEL = '%s' " % (str(message.channel.name)))
         conn.commit()
 
-    # Just for checking
-    elif message.content == "!delete":
-        #print(delete)
-        messages=await message.channel.fetch_message(delete[message.channel.name].pop(0))
-        #print(messages)
-        #a=delete[message.channel.name].pop(0)
-        #print(a)
-        #await message.delete(a)
-        #await message.channel.delete_messages(messages)
-        await messages.delete(delay=None)
-
-
-
-    elif str(message.content)[:4] == "!del":      
+    elif str(message.content)[:4] == "!del":      # To delete messages
         cur.execute("SELECT channel, msgid, date from MESSAGES where channel='%s' " % (str(message.channel.name)))
         rows = cur.fetchall()
         a=9999
@@ -170,13 +153,6 @@ async def on_message(message):
                     cur.execute("DELETE from MESSAGES where MSGID='%s';" % (row[1]))
                     conn.commit()
 
-
-
-
-
-        
-
-
     elif str(message.content[:6]) == "!email":       # Add the emails of the members
         email_add=message.content[6:]
         email_add=email_add.strip()
@@ -205,7 +181,7 @@ async def on_message(message):
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
             subject = "An update was made to the git repository"
-            body = ""
+            body = "An update was made to the git repository\n\n"
 
             for i in message.embeds:
                 body+=i.title+"\n\n"
