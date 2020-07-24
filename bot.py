@@ -5,15 +5,34 @@ from discord.ext import commands
 from botpass import *
 import os
 import smtplib
+import psycopg2
+from datetime import date
 
 EMAIL_ADDRESS = userid
 EMAIL_PASSWORD = userpass
 
+conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+print ("Opened database successfully")
+
+cur = conn.cursor()
+
+cur.execute('''CREATE TABLE DISCORDBOT
+      (CHANNEL           VARCHAR(50)    NOT NULL,
+      USERNAME            VARCHAR(50)     NOT NULL,
+      MSGCNT        INT,
+      EMAIL         TEXT);''')
+
+conn.commit()
+
+cur.execute('''CREATE TABLE MESSAGES
+      (CHANNEL           VARCHAR(50)    NOT NULL,
+      MSGID            VARCHAR(50)     NOT NULL,
+      DATE        TEXT);''')
+
+conn.commit()
+
 client = discord.Client()
 
-d=dict()
-emails=dict()
-delete=dict()
 
 @client.event
 async def on_ready():
@@ -24,6 +43,7 @@ async def on_message(message):
     
     id = client.get_guild(729892665390268467)
 
+    cur.execute("INSERT INTO MESSAGES (channel,MSGID,DATE) VALUES (%s,%s,%s)", (str(message.channel.name), str(message.id), str(date.today())))
 
     # Counts the number of messages by each member
     if "BOT" in str(message.author.name):
@@ -31,36 +51,39 @@ async def on_message(message):
     elif "GitHub" in str(message.author.name):
         pass
     else:
+        
 
-        if message.channel.name in d:
-            if message.author.name in d[message.channel.name]:
-                d[message.channel.name][message.author.name]+=1
-            else:
-                d[message.channel.name][message.author.name]=1
-
-            delete[message.channel.name].append(message.id)
-
+        cur.execute("SELECT channel, username, msgcnt, email from DISCORDBOT")
+        rows = cur.fetchall()
+        if(len(rows)):
+            flag=0
+            for row in rows:
+                if(row[0]==message.channel.name and row[1]==message.author.name):
+                    flag=1
+                    cur.execute("UPDATE DISCORDBOT set MSGCNT = %s where CHANNEL = %s and USERNAME = %s", (int(int(row[2])+1), str(message.channel.name), str(message.author.name)))
+                    break
+            if(flag==0):    
+                cur.execute("INSERT INTO DISCORDBOT (channel,USERNAME,MSGCNT,EMAIL) VALUES (%s,%s,1,'Not Updated')", (str(message.channel.name), str(message.author.name)))
+        
         else:
-            d[message.channel.name]=dict()
-            d[message.channel.name][message.author.name]=1
-
-            delete[message.channel.name]=list()
-            delete[message.channel.name].append(message.id)
-
-        if message.channel.name not in emails:
-            emails[message.channel.name]=dict()
+            cur.execute("INSERT INTO DISCORDBOT (channel,USERNAME,MSGCNT,EMAIL) VALUES (%s,%s,1,'Not Updated')", (str(message.channel.name), str(message.author.name)))
+        conn.commit()
 
 
 
+    
     if message.content == "!users":                 # To find number of users in the channel 
         await message.channel.send(f"# of Members: {id.member_count}")
 
     elif message.content == "!msgcnt":              # To find number of messages sent by each users
-        for i in d[message.channel.name]:
-            await message.channel.send(f"{i}: {d[message.channel.name][i]}")
+        cur.execute("SELECT channel, username, msgcnt from DISCORDBOT where channel='%s' " % (str(message.channel.name)))
+        rows = cur.fetchall()
+        for i in rows:
+            await message.channel.send(f"{i[1]}: {i[2]}")
 
     elif message.content == "!rstcnt":             # To reset the count of messages of each user in a channel
-        d[message.channel.name]=dict()
+        cur.execute("UPDATE DISCORDBOT set MSGCNT = 0 where CHANNEL = '%s' " % (str(message.channel.name)))
+        conn.commit()
 
     # Just for checking
     elif message.content == "!delete":
@@ -75,22 +98,98 @@ async def on_message(message):
 
 
 
-    elif str(message.content)[:5] == "!del ":      # To delete the number of messages specified
-        await message.channel.purge(limit=min(100,int(str(message.content[5:]))))
-        await message.channel.send(f"{min(100,int(str(message.content[5:])))} messages Deleted")
+    elif str(message.content)[:4] == "!del":      
+        cur.execute("SELECT channel, msgid, date from MESSAGES where channel='%s' " % (str(message.channel.name)))
+        rows = cur.fetchall()
+        a=9999
+        b=9999
+        c=9999
+        for i in rows:
+            d=i[2]
+            a1,b1,c1=str(d).split("-")
+            a1=int(a1)
+            b1=int(b1)
+            c1=int(c1)
+            if(a>a1):
+                a=a1
+                b=b1
+                c=c1
+            elif(a==a1):
+                if(b>b1):
+                    b=b1
+                    c=c1
+                elif(b==b1):
+                    if(c>c1):
+                        c=c1
+
+        if str(message.content)[5:] == "week":   # To delete messages in the starting week
+            for row in rows:
+                d=row[2]
+                a1,b1,c1=str(d).split("-")
+                a1=int(a1)
+                b1=int(b1)
+                c1=int(c1)
+                if(0<=c and c<=7):
+                    if(a1==a and b1==b and 0<=c1 and c1<=7):
+                        messages=await message.channel.fetch_message(int(row[1]))
+                        await messages.delete(delay=None)
+                        cur.execute("DELETE from MESSAGES where MSGID='%s';" % (row[1]))
+                        conn.commit()
+
+                elif(8<=c and c<=14):
+                    if(a1==a and b1==b and 8<=c1 and c1<=14):
+                        messages=await message.channel.fetch_message(int(row[1]))
+                        await messages.delete(delay=None)
+                        cur.execute("DELETE from MESSAGES where MSGID='%s';" % (row[1]))
+                        conn.commit()
+
+                elif(15<=c and c<=21):
+                    if(a1==a and b1==b and 15<=c1 and c1<=21):
+                        messages=await message.channel.fetch_message(int(row[1]))
+                        await messages.delete(delay=None)
+                        cur.execute("DELETE from MESSAGES where MSGID='%s';" % (row[1]))
+                        conn.commit()
+
+                elif(22<=c and c<=31):
+                    if(a1==a and b1==b and 22<=c1 and c1<=31):
+                        messages=await message.channel.fetch_message(int(row[1]))
+                        await messages.delete(delay=None)
+                        cur.execute("DELETE from MESSAGES where MSGID='%s';" % (row[1]))
+                        conn.commit()
+
+        elif str(message.content)[5:] == "month":     # To delete messages in the starting month
+            for row in rows:
+                d=row[2]
+                a1,b1,c1=str(d).split("-")
+                a1=int(a1)
+                b1=int(b1)
+                c1=int(c1)
+                if(a1==a and b1==b):
+                    messages=await message.channel.fetch_message(int(row[1]))
+                    await messages.delete(delay=None)
+                    cur.execute("DELETE from MESSAGES where MSGID='%s';" % (row[1]))
+                    conn.commit()
+
+
+
+
+
+        
 
 
     elif str(message.content[:6]) == "!email":       # Add the emails of the members
         email_add=message.content[6:]
-        if email_add not in emails:
-            emails[message.channel.name][message.author.name]=email_add.strip()
+        email_add=email_add.strip()
+        cur.execute("UPDATE DISCORDBOT set EMAIL = '%s' where channel = '%s' and username = '%s' " % (str(email_add), str(message.channel.name), str(message.author.name)))
+        conn.commit()
 
 
     elif message.content == "!help":                 # To show all the possible options available with the bot
         embed = discord.Embed(title="Help on BOT", description="Some useful commands")
         embed.add_field(name="!users",value="Returns the number of users in the channel")
         embed.add_field(name="!email <email id>",value="Sends an email when a pull request is made")
-        embed.add_field(name="!del <int>",value="Deletes the specified number of messages")
+        embed.add_field(name="!del week",value="Deletes the messages in the starting week")
+        embed.add_field(name="!del month",value="Deletes the messages in the starting month")
         embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
         embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
         await message.channel.send(content=None, embed=embed)
@@ -114,25 +213,21 @@ async def on_message(message):
 
             msg = f"Subject: {subject}\n\n{body}"
 
-            email_ids=emails[message.channel.name].values()
-            for i in email_ids:
-                smtp.sendmail(EMAIL_ADDRESS,i,msg)
+            cur.execute("SELECT email from DISCORDBOT where channel='%s' " % (str(message.channel.name)))
+            rows = cur.fetchall()
+            for i in rows:
+                if(i[0]!="Not Updated"):
+                    smtp.sendmail(EMAIL_ADDRESS,i[0],msg)
 
 
 
 @client.event
 async def on_member_remove(member):
 
-    # To remove the member from the messages count and their email from the email
+    # To remove the member from the database
     var_a=str(member.name)
-    for i in list(d.keys()):
-        if var_a in d[i]:
-            d[i].pop(var_a)
-
-    for i in list(emails.keys()):
-        if var_a in emails[i]:
-            emails[i].pop(var_a)
-        
+    cur.execute("DELETE from DISCORDBOT where USERNAME='%s' ;" % (str(member.name)))
+    conn.commit()
 
 
 client.run(token)
