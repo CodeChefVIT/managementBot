@@ -27,7 +27,8 @@ conn.commit()
 cur.execute('''CREATE TABLE MESSAGES
       (CHANNEL           VARCHAR(50)    NOT NULL,
       MSGID            VARCHAR(50)     NOT NULL,
-      DATE        TEXT);''')
+      DATE        TEXT,
+      ROLES         VARCHAR(200));''')
 
 conn.commit()
 
@@ -43,7 +44,12 @@ async def on_message(message):
     
     id = client.get_guild(729892665390268467)
 
-    cur.execute("INSERT INTO MESSAGES (channel,MSGID,DATE) VALUES (%s,%s,%s)", (str(message.channel.name), str(message.id), str(date.today())))
+    role_str=[]
+    role=message.author.roles
+    for i in role:
+        role_str.append(str(i.name))
+
+    cur.execute("INSERT INTO MESSAGES (channel,MSGID,DATE,ROLES) VALUES (%s,%s,%s,%s)", (str(message.channel.name), str(message.id), str(date.today()), str("!.#$%".join(role_str))))
 
     # Counts the number of messages by each member
     if "BOT" in str(message.author.name):
@@ -80,6 +86,20 @@ async def on_message(message):
     elif message.content == "!rstcnt":             # To reset the count of messages of each user in a channel
         cur.execute("UPDATE DISCORDBOT set MSGCNT = 0 where CHANNEL = '%s' " % (str(message.channel.name)))
         conn.commit()
+
+    elif str(message.content)[:9] == "!del role":  # Delete messages by the roles
+        role_del = str(message.content)[9:]
+        role_del = role_del.strip()
+        cur.execute("SELECT channel, msgid, date, roles from MESSAGES where channel='%s' " % (str(message.channel.name)))
+        rows = cur.fetchall()
+        for row in rows:
+            list_split=str(row[3]).split("!.#$%")
+            if str(role_del) in list_split:
+                messages=await message.channel.fetch_message(int(row[1]))
+                await messages.delete(delay=None)
+                cur.execute("DELETE from MESSAGES where MSGID='%s';" % (row[1]))
+                conn.commit()
+
 
     elif str(message.content)[:4] == "!del":      # To delete messages
         cur.execute("SELECT channel, msgid, date from MESSAGES where channel='%s' " % (str(message.channel.name)))
@@ -164,6 +184,7 @@ async def on_message(message):
         embed = discord.Embed(title="Help on BOT", description="Some useful commands")
         embed.add_field(name="!users",value="Returns the number of users in the channel")
         embed.add_field(name="!email <email id>",value="Sends an email when a pull request is made")
+        embed.add_field(name="!del role <name of role>",value="Deletes the messages by members of the specified role")
         embed.add_field(name="!del week",value="Deletes the messages in the starting week")
         embed.add_field(name="!del month",value="Deletes the messages in the starting month")
         embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
