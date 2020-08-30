@@ -2,7 +2,7 @@
 
 import discord
 from discord.ext import commands
-from botpass import *
+from Botpass import *
 import os
 import smtplib
 import psycopg2
@@ -44,11 +44,9 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    id = client.get_guild(729892665390268467)
+    id = client.get_guild(bot_id)
 
-    if "BOT" in str(message.author.name):
-        pass
-    elif "GitHub" in str(message.author.name):
+    if message.author.bot:
         pass
     else:
         role_str=[]
@@ -59,9 +57,7 @@ async def on_message(message):
             cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE,ROLES) VALUES (%s,%s,%s,%s,%s)", (str(message.guild),str(message.channel.name), str(message.id), str(date.today()), str("!.#$%".join(role_str))))
 
     # Counts the number of messages by each member
-    if "BOT" in str(message.author.name):
-        pass
-    elif "GitHub" in str(message.author.name):
+    if message.author.bot:
         pass
     else:
         
