@@ -21,7 +21,8 @@ cur.execute('''CREATE TABLE DISCORDBOT
       CHANNEL           VARCHAR(50)    NOT NULL,
       USERNAME            VARCHAR(50)     NOT NULL,
       MSGCNT        INT,
-      EMAIL         TEXT);''')
+      EMAIL         TEXT,
+      DATE        TEXT);''')
 
 conn.commit()
 
@@ -65,23 +66,23 @@ async def on_message(message):
             for row in rows:
                 if(row[0]==message.channel.name and row[1]==message.author.name):
                     flag=1
-                    cur.execute("UPDATE DISCORDBOT set MSGCNT = %s where CHANNEL = %s and USERNAME = %s and SERVER = %s", (int(int(row[2])+1), str(message.channel.name), str(message.author.name),str(message.guild)))
+                    cur.execute("UPDATE DISCORDBOT set MSGCNT = %s where CHANNEL = %s and USERNAME = %s and SERVER = %s and DATE = %s", (int(int(row[2])+1), str(message.channel.name), str(message.author.name),str(message.guild),str(date.today())))
                     break
             if(flag==0):    
-                cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL) VALUES (%s,%s,%s,1,'Not Updated')", (str(message.guild),str(message.channel.name), str(message.author.name)))
+                cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE) VALUES (%s,%s,%s,1,'Not Updated',%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today())))
         
         else:
-            cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL) VALUES (%s,%s,%s,1,'Not Updated')", (str(message.guild),str(message.channel.name), str(message.author.name)))
+            cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE) VALUES (%s,%s,%s,1,'Not Updated',%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today())))
         conn.commit()
 
     if message.content == "!users":                 # To find number of users in the channel 
         await message.channel.send(f"# of Members: {id.member_count}")
 
     elif message.content == "!msgcnt":              # To find number of messages sent by each users
-        cur.execute("SELECT username, msgcnt from DISCORDBOT where channel = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
+        cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
         rows = cur.fetchall()
         for i in rows:
-            await message.channel.send(f"{i[0]}: {i[1]}")
+            await message.channel.send(f"{i[0]}: {i[1]}, Last msg posted on {i[2]}")
 
     elif message.content == "!rstcnt":             # To reset the count of messages of each user in a channel
         cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
