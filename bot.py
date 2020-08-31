@@ -45,7 +45,6 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    id = client.get_guild(bot_id)
 
     role_str=[]
     role=message.author.roles
@@ -76,7 +75,7 @@ async def on_message(message):
         conn.commit()
 
     if message.content == "!users":                 # To find number of users in the channel 
-        await message.channel.send(f"# of Members: {id.member_count}")
+        await message.channel.send(f"# of Members: {message.guild.member_count}")
 
     elif message.content == "!msgcnt":              # To find number of messages sent by each users
         cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
