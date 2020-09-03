@@ -192,7 +192,18 @@ async def on_message(message):
             embed.add_field(name="!del month",value="Deletes the messages in the starting month")
             embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
             embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
+            embed.add_field(name="!online count",value="Returns number of online members present")
             await message.channel.send(content=None, embed=embed)
+
+        elif message.content == "!online count":
+
+            list_members = message.guild.members
+            count_online_members = message.guild.member_count
+            for i in list_members:
+                if str(i.status)=="offline":
+                    count_online_members-=1
+            
+            await message.channel.send(f"# of Online Members: {count_online_members}")           
 
 
     elif "GitHub" in str(message.author.name):      #To send emails when a Github Pull request is made
