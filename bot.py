@@ -45,8 +45,6 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    #   message.guild.id
-
     role_str=[]
     role=message.author.roles
     for i in role:
@@ -196,7 +194,7 @@ async def on_message(message):
             embed.add_field(name="!role count",value="Returns number of members under each role")
             await message.channel.send(content=None, embed=embed)
 
-        elif message.content == "!online count":
+        elif message.content == "!online count":        # To find out number of online members
 
             list_members = message.guild.members
             count_online_members = message.guild.member_count
@@ -206,7 +204,7 @@ async def on_message(message):
             
             await message.channel.send(f"# of Online Members: {count_online_members}")       
 
-        elif message.content == "!role count":
+        elif message.content == "!role count":         # To find out number of members under each role
 
             list_members = message.guild.members
             roles_count = {}
