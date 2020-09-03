@@ -45,8 +45,6 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    #   message.guild.id
-
     role_str=[]
     role=message.author.roles
     for i in role:
@@ -192,10 +190,40 @@ async def on_message(message):
             embed.add_field(name="!del month",value="Deletes the messages in the starting month")
             embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
             embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
+            embed.add_field(name="!online count",value="Returns number of online members present")
+            embed.add_field(name="!role count",value="Returns number of members under each role")
             await message.channel.send(content=None, embed=embed)
 
+        elif message.content == "!online count":        # To find out number of online members
 
-    elif "GitHub" in str(message.author.name):      #To send emails when a Github Pull request is made
+            list_members = message.guild.members
+            count_online_members = message.guild.member_count
+            for i in list_members:
+                if str(i.status)=="offline":
+                    count_online_members-=1
+            
+            await message.channel.send(f"# of Online Members: {count_online_members}")       
+
+        elif message.content == "!role count":         # To find out number of members under each role
+
+            list_members = message.guild.members
+            roles_count = {}
+            for i in list_members:
+                member_roles = i.roles
+                for j in member_roles:
+                    if j in roles_count:
+                        roles_count[j]+=1
+                    else:
+                        roles_count[j]=1
+            await message.channel.send(f"Roles :- Members")
+            for i in roles_count.keys():
+                if str(i.name)[0]=="@":
+                    await message.channel.send(f"{str(i.name)[1:]} :- {roles_count[i]}")
+                else:
+                    await message.channel.send(f"{str(i.name)} :- {roles_count[i]}")
+
+
+    elif ("GitHub" in str(message.author.name) and message.author.bot):      #To send emails when a Github Pull request is made
 
         with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
             smtp.ehlo()
