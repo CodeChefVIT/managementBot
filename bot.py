@@ -7,6 +7,7 @@ import os
 import smtplib
 import psycopg2
 from datetime import date
+from mask import encrypt_string,decrypt_string
 
 EMAIL_ADDRESS = userid
 EMAIL_PASSWORD = userpass
@@ -50,7 +51,7 @@ async def on_message(message):
     for i in role:
         role_str.append(str(i.name))
     if(len(role_str)):
-        cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE,ROLES) VALUES (%s,%s,%s,%s,%s)", (str(message.guild),str(message.channel.name), str(message.id), str(date.today()), str("!.#$%".join(role_str))))
+        cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE,ROLES) VALUES (%s,%s,%s,%s,%s)", (str(message.guild),str(message.channel.name), str(encrypt_string(str(message.id))), str(date.today()), str("!.#$%".join(role_str))))
 
     # Counts the number of messages by each member
     if message.author.bot:
@@ -96,7 +97,7 @@ async def on_message(message):
             for row in rows:
                 list_split=str(row[3]).split("!.#$%")
                 if str(role_del) in list_split:
-                    messages=await message.channel.fetch_message(int(row[1]))
+                    messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                     await messages.delete(delay=None)
                     cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                     conn.commit()
@@ -135,28 +136,28 @@ async def on_message(message):
                     c1=int(c1)
                     if(0<=c and c<=7):
                         if(a1==a and b1==b and 0<=c1 and c1<=7):
-                            messages=await message.channel.fetch_message(int(row[1]))
+                            messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                             await messages.delete(delay=None)
                             cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                             conn.commit()
 
                     elif(8<=c and c<=14):
                         if(a1==a and b1==b and 8<=c1 and c1<=14):
-                            messages=await message.channel.fetch_message(int(row[1]))
+                            messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                             await messages.delete(delay=None)
                             cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                             conn.commit()
 
                     elif(15<=c and c<=21):
                         if(a1==a and b1==b and 15<=c1 and c1<=21):
-                            messages=await message.channel.fetch_message(int(row[1]))
+                            messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                             await messages.delete(delay=None)
                             cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                             conn.commit()
 
                     elif(22<=c and c<=31):
                         if(a1==a and b1==b and 22<=c1 and c1<=31):
-                            messages=await message.channel.fetch_message(int(row[1]))
+                            messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                             await messages.delete(delay=None)
                             cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                             conn.commit()
@@ -169,7 +170,7 @@ async def on_message(message):
                     b1=int(b1)
                     c1=int(c1)
                     if(a1==a and b1==b):
-                        messages=await message.channel.fetch_message(int(row[1]))
+                        messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                         await messages.delete(delay=None)
                         cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                         conn.commit()
