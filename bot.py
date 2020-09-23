@@ -23,7 +23,8 @@ cur.execute('''CREATE TABLE DISCORDBOT
       USERNAME            VARCHAR(50)     NOT NULL,
       MSGCNT        INT,
       EMAIL         TEXT,
-      DATE        TEXT);''')
+      DATE        TEXT,
+      ROLES         VARCHAR(200));''')
 
 conn.commit()
 
@@ -57,7 +58,10 @@ async def on_message(message):
     if message.author.bot:
         pass
     else:
-        
+        role_str=[]
+        role=message.author.roles
+        for i in role:
+            role_str.append(str(i.name))
         cur.execute("SELECT channel, username, msgcnt, email from DISCORDBOT where server='%s'" % (str(message.guild)))
         rows = cur.fetchall()
         if(len(rows)):
@@ -68,10 +72,10 @@ async def on_message(message):
                     cur.execute("UPDATE DISCORDBOT set MSGCNT = %s where CHANNEL = %s and USERNAME = %s and SERVER = %s and DATE = %s", (int(int(row[2])+1), str(message.channel.name), str(message.author.name),str(message.guild),str(date.today())))
                     break
             if(flag==0):    
-                cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE) VALUES (%s,%s,%s,1,'Not Updated',%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today())))
+                cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today()), str("!.#$%".join(role_str))))
         
         else:
-            cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE) VALUES (%s,%s,%s,1,'Not Updated',%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today())))
+            cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today()), str("!.#$%".join(role_str))))
         conn.commit()
 
     if(message.guild.roles[-1].id==message.author.roles[-1].id):
@@ -87,6 +91,19 @@ async def on_message(message):
 
         elif message.content == "!rstcnt":             # To reset the count of messages of each user in a channel
             cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
+            conn.commit()
+
+        elif str(message.content)[:12] == "!rstcnt role":      # To reset the count of messages of for the specified role in a channel
+            role=str(message.content)[13:].strip()
+            cur.execute("SELECT username, msgcnt, date, roles from DISCORDBOT where channel = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
+            rows = cur.fetchall()
+            for i in rows:
+                if(role in i[-1]):
+                    cur.execute("DELETE from DISCORDBOT where channel = '%s' and server = '%s' and username='%s' and date='%s' and roles='%s'" % (str(message.channel.name),str(message.guild),str(i[0]),str(i[2]),str(i[-1])))
+
+        elif str(message.content)[:12] == "!rstcnt user":      # To reset the count of messages of for the specified role in a channel
+            username=str(message.content)[13:].strip()
+            cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' and username = '%s'" % (str(message.channel.name),str(message.guild), str(username)))
             conn.commit()
 
         elif str(message.content)[:9] == "!del role":  # Delete messages by the roles
@@ -191,6 +208,8 @@ async def on_message(message):
             embed.add_field(name="!del month",value="Deletes the messages in the starting month")
             embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
             embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
+            embed.add_field(name="!rstcnt role <name of the role>",value="Resets the number of messages of each user of that role to Zero")
+            embed.add_field(name="!rstcnt user <name of the user>",value="Resets the number of messages of that user to Zero")
             embed.add_field(name="!online count",value="Returns number of online members present")
             embed.add_field(name="!role count",value="Returns number of members under each role")
             await message.channel.send(content=None, embed=embed)
