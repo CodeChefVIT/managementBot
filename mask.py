@@ -1,6 +1,8 @@
-p=31
-q=37
-r=43
+from decouple import config
+
+p=config('p', cast=int)
+q=config('q', cast=int)
+r=config('r', cast=int)
 n=p*q*r
 phi=(p-1)*(q-1)*(r-1)
 

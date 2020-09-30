@@ -2,15 +2,15 @@
 
 import discord
 from discord.ext import commands
-from botpass import *
 import os
 import smtplib
 import psycopg2
 from datetime import date
 from mask import encrypt_string,decrypt_string
+from decouple import config
 
-EMAIL_ADDRESS = userid
-EMAIL_PASSWORD = userpass
+EMAIL_ADDRESS = config('userid')
+EMAIL_PASSWORD = config('userpass')
 
 conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
 print ("Opened database successfully")
@@ -278,4 +278,4 @@ async def on_member_remove(member):
     conn.commit()
 
 
-client.run(token)
+client.run(config('token'))

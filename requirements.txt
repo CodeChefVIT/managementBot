@@ -1,0 +1,4 @@
+discord.py==1.4.1
+psycopg2==2.8.5
+async-timeout==3.0.1
+python-decouple==3.3
