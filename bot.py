@@ -83,6 +83,8 @@ async def on_message(message):
                     flag=1
                     cur.execute("UPDATE DISCORDBOT set MSGCNT = %s where CHANNEL = %s and USERNAME = %s and SERVER = %s and DATE = %s", (int(int(row[2])+1), str(message.channel.name), str(message.author.name),str(message.guild),str(date.today())))
                     print("(msgcnt,channel,username,server,DATE) updated in DISCORDBOT table")
+                    conn.commit()
+                    print("Updated Discord bot table")
                     break
             if(flag==0):    
                 cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today()), str("!.#$%".join(role_str))))
@@ -92,6 +94,7 @@ async def on_message(message):
             cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today()), str("!.#$%".join(role_str))))
             print("(server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) inserted in DISCORDBOT table")
         conn.commit()
+        print("Saved to DB")
 
     if(message.guild.roles[-1].id==message.author.roles[-1].id):
 
