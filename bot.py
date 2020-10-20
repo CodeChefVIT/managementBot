@@ -12,30 +12,36 @@ from decouple import config
 EMAIL_ADDRESS = config('userid')
 EMAIL_PASSWORD = config('userpass')
 
-conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
-print ("Opened database successfully")
+try:
+    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    print ("Opened database successfully")
+    cur = conn.cursor()
 
-cur = conn.cursor()
+    cur = conn.cursor()
 
-cur.execute('''CREATE TABLE DISCORDBOT
-      (SERVER           VARCHAR(50)    NOT NULL,
-      CHANNEL           VARCHAR(50)    NOT NULL,
-      USERNAME            VARCHAR(50)     NOT NULL,
-      MSGCNT        INT,
-      EMAIL         TEXT,
-      DATE        TEXT,
-      ROLES         VARCHAR(200));''')
+    cur.execute('''CREATE TABLE DISCORDBOT
+        (SERVER           VARCHAR(50)    NOT NULL,
+        CHANNEL           VARCHAR(50)    NOT NULL,
+        USERNAME            VARCHAR(50)     NOT NULL,
+        MSGCNT        INT,
+        EMAIL         TEXT,
+        DATE        TEXT,
+        ROLES         VARCHAR(200));''')
 
-conn.commit()
+    conn.commit()
 
-cur.execute('''CREATE TABLE MESSAGES
-      (SERVER           VARCHAR(50)    NOT NULL,
-      CHANNEL           VARCHAR(50)    NOT NULL,
-      MSGID            VARCHAR(50)     NOT NULL,
-      DATE        TEXT,
-      ROLES         VARCHAR(200));''')
+    cur.execute('''CREATE TABLE MESSAGES
+        (SERVER           VARCHAR(50)    NOT NULL,
+        CHANNEL           VARCHAR(50)    NOT NULL,
+        MSGID            VARCHAR(50)     NOT NULL,
+        DATE        TEXT,
+        ROLES         VARCHAR(200));''')
 
-conn.commit()
+    conn.commit()
+    cur.close()
+    conn.close()
+except:
+    pass
 
 client = discord.Client()
 
@@ -47,12 +53,18 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
+    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    print ("Opened database successfully")
+    cur = conn.cursor()
+
     role_str=[]
     role=message.author.roles
     for i in role:
         role_str.append(str(i.name))
     if(len(role_str)):
         cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE,ROLES) VALUES (%s,%s,%s,%s,%s)", (str(message.guild),str(message.channel.name), str(encrypt_string(str(message.id))), str(date.today()), str("!.#$%".join(role_str))))
+        print("(server,channel,MSGID,DATE,ROLES) inserted in messages table")
+        conn.commit()
 
     # Counts the number of messages by each member
     if message.author.bot:
@@ -70,12 +82,15 @@ async def on_message(message):
                 if(row[0]==message.channel.name and row[1]==message.author.name):
                     flag=1
                     cur.execute("UPDATE DISCORDBOT set MSGCNT = %s where CHANNEL = %s and USERNAME = %s and SERVER = %s and DATE = %s", (int(int(row[2])+1), str(message.channel.name), str(message.author.name),str(message.guild),str(date.today())))
+                    print("(msgcnt,channel,username,server,DATE) updated in DISCORDBOT table")
                     break
             if(flag==0):    
                 cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today()), str("!.#$%".join(role_str))))
+                print("(server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) inserted in DISCORDBOT table")
         
         else:
             cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today()), str("!.#$%".join(role_str))))
+            print("(server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) inserted in DISCORDBOT table")
         conn.commit()
 
     if(message.guild.roles[-1].id==message.author.roles[-1].id):
@@ -91,6 +106,7 @@ async def on_message(message):
 
         elif message.content == "!rstcnt":             # To reset the count of messages of each user in a channel
             cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
+            print("A whole channel deleted in DISCORDBOT table")
             conn.commit()
 
         elif str(message.content)[:12] == "!rstcnt role":      # To reset the count of messages of for the specified role in a channel
@@ -100,10 +116,13 @@ async def on_message(message):
             for i in rows:
                 if(role in i[-1]):
                     cur.execute("DELETE from DISCORDBOT where channel = '%s' and server = '%s' and username='%s' and date='%s' and roles='%s'" % (str(message.channel.name),str(message.guild),str(i[0]),str(i[2]),str(i[-1])))
+                    print("Rows containing a specific role deleted in DISCORDBOT table")
+                    conn.commit()
 
         elif str(message.content)[:12] == "!rstcnt user":      # To reset the count of messages of for the specified role in a channel
             username=str(message.content)[13:].strip()
             cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' and username = '%s'" % (str(message.channel.name),str(message.guild), str(username)))
+            print("Row containing a specific user deleted in DISCORDBOT table")
             conn.commit()
 
         elif str(message.content)[:9] == "!del role":  # Delete messages by the roles
@@ -117,6 +136,7 @@ async def on_message(message):
                     messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                     await messages.delete(delay=None)
                     cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                    print("Rows with messages from a role deleted in MESSAGES table")
                     conn.commit()
 
 
@@ -156,6 +176,7 @@ async def on_message(message):
                             messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                             await messages.delete(delay=None)
                             cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                            print("Rows with messages for a week deleted in MESSAGES table")
                             conn.commit()
 
                     elif(8<=c and c<=14):
@@ -163,6 +184,7 @@ async def on_message(message):
                             messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                             await messages.delete(delay=None)
                             cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                            print("Rows with messages for a week deleted in MESSAGES table")
                             conn.commit()
 
                     elif(15<=c and c<=21):
@@ -170,6 +192,7 @@ async def on_message(message):
                             messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                             await messages.delete(delay=None)
                             cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                            print("Rows with messages for a week deleted in MESSAGES table")
                             conn.commit()
 
                     elif(22<=c and c<=31):
@@ -177,6 +200,7 @@ async def on_message(message):
                             messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                             await messages.delete(delay=None)
                             cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                            print("Rows with messages for a week deleted in MESSAGES table")
                             conn.commit()
 
             elif str(message.content)[5:] == "month":     # To delete messages in the starting month
@@ -190,12 +214,14 @@ async def on_message(message):
                         messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                         await messages.delete(delay=None)
                         cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                        print("Rows with messages for a month deleted in MESSAGES table")
                         conn.commit()
 
         elif str(message.content[:6]) == "!email":       # Add the emails of the members
             email_add=message.content[6:]
             email_add=email_add.strip()
             cur.execute("UPDATE DISCORDBOT set EMAIL = '%s' where channel = '%s' and username = '%s' and server = '%s' " % (str(email_add), str(message.channel.name), str(message.author.name),str(message.guild)))
+            print("Email of a person updated in DISCORDBOT table")
             conn.commit()
 
 
@@ -219,7 +245,7 @@ async def on_message(message):
             list_members = message.guild.members
             count_online_members = message.guild.member_count
             for i in list_members:
-                if str(i.status)=="offline":
+                if str(i.status)=="offline" or bool(i.bot):
                     count_online_members-=1
             
             await message.channel.send(f"# of Online Members: {count_online_members}")       
@@ -266,16 +292,11 @@ async def on_message(message):
             for i in rows:
                 if(i[0]!="Not Updated"):
                     smtp.sendmail(EMAIL_ADDRESS,i[0],msg)
-
-
-
-@client.event
-async def on_member_remove(member):
-
-    # To remove the member from the database
-    var_a=str(member.name)
-    cur.execute("DELETE from DISCORDBOT where USERNAME='%s' and server='%s';" % (str(member.name),str(message.guild)))
     conn.commit()
+    cur.close()
+    conn.close()
+
+
 
 
 client.run(config('token'))
