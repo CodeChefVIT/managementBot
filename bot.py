@@ -13,7 +13,7 @@ EMAIL_ADDRESS = config('userid')
 EMAIL_PASSWORD = config('userpass')
 
 try:
-    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
 
@@ -53,7 +53,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
 
@@ -83,6 +83,8 @@ async def on_message(message):
                     flag=1
                     cur.execute("UPDATE DISCORDBOT set MSGCNT = %s where CHANNEL = %s and USERNAME = %s and SERVER = %s and DATE = %s", (int(int(row[2])+1), str(message.channel.name), str(message.author.name),str(message.guild),str(date.today())))
                     print("(msgcnt,channel,username,server,DATE) updated in DISCORDBOT table")
+                    conn.commit()
+                    print("Updated Discord bot table")
                     break
             if(flag==0):    
                 cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today()), str("!.#$%".join(role_str))))
@@ -92,6 +94,7 @@ async def on_message(message):
             cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild),str(message.channel.name), str(message.author.name), str(date.today()), str("!.#$%".join(role_str))))
             print("(server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) inserted in DISCORDBOT table")
         conn.commit()
+        print("Saved to DB")
 
     if(message.guild.roles[-1].id==message.author.roles[-1].id):
 
