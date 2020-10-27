@@ -81,9 +81,9 @@ async def on_message(message):
             for row in rows:
                 if(row[0]==message.channel.name and row[1]==message.author.name):
                     flag=1
-                    print(message.author.name,message.channel.name,int(row[2])+1)
+                    print(message.author.name,message.channel.name,int(row[2])+1,date.today())
                     cur.execute("UPDATE DISCORDBOT set MSGCNT = %s where CHANNEL = %s and USERNAME = %s and SERVER = %s and DATE = %s", (int(int(row[2])+1), str(message.channel.name), str(message.author.name),str(message.guild),str(date.today())))
-                    print(message.author.name,message.channel.name,int(row[2])+1)
+                    print(message.author.name,message.channel.name,int(row[2])+1,date.today())
                     conn.commit()
                     print("Updated Discord bot table")
                     break
