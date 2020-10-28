@@ -301,6 +301,47 @@ async def on_message(message):
     conn.close()
 
 
+@client.event
+async def on_member_remove(member):
+    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    # To remove the member from the database
+    cur.execute("DELETE from DISCORDBOT where USERNAME='%s' and server='%s';" % (str(member.name),str(member.guild)))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+@client.event
+async def on_private_channel_delete(channel):
+    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    # To remove this channel from the database
+    cur.execute("DELETE from DISCORDBOT where channel='%s' and server='%s';" % (str(channel.name),str(channel.guild)))
+    conn.commit()
+    cur.execute("DELETE from MESSAGES where channel='%s' and server='%s';" % (str(channel.name),str(channel.guild)))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+@client.event
+async def on_guild_channel_delete(channel):
+    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    # To remove this channel from the database
+    cur.execute("DELETE from DISCORDBOT where channel='%s' and server='%s';" % (str(channel.name),str(channel.guild)))
+    conn.commit()
+    cur.execute("DELETE from MESSAGES where channel='%s' and server='%s';" % (str(channel.name),str(channel.guild)))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+
 
 
 client.run(config('token'))
