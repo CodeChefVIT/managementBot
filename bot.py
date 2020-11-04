@@ -303,7 +303,7 @@ async def on_message(message):
 
 @client.event
 async def on_member_remove(member):
-    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
     # To remove the member from the database
@@ -315,7 +315,7 @@ async def on_member_remove(member):
 
 @client.event
 async def on_private_channel_delete(channel):
-    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
     # To remove this channel from the database
@@ -329,7 +329,7 @@ async def on_private_channel_delete(channel):
 
 @client.event
 async def on_guild_channel_delete(channel):
-    conn = psycopg2.connect(database = "managementbot", user = "postgres", password = "1234", host = "127.0.0.1", port = "5432")
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
     # To remove this channel from the database
