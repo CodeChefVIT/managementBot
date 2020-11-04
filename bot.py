@@ -307,6 +307,8 @@ async def on_member_remove(member):
     print ("Opened database successfully")
     cur = conn.cursor()
     # To remove the member from the database
+    print("Member removed part")
+    print(str(member.name),str(member.guild))
     cur.execute("DELETE from DISCORDBOT where USERNAME='%s' and server='%s';" % (str(member.name),str(member.guild)))
     conn.commit()
     cur.close()
