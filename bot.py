@@ -352,6 +352,8 @@ async def on_guild_remove(guild):
     print("Removed from guild")
     cur.execute("DELETE from DISCORDBOT where server='%s';" % (str(guild)))
     conn.commit()
+    cur.execute("DELETE from MESSAGES where server='%s';" % (str(guild)))
+    conn.commit()
     cur.close()
     conn.close()
 
