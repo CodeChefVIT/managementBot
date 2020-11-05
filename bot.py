@@ -343,6 +343,18 @@ async def on_guild_channel_delete(channel):
     conn.close()
 
 
+@client.event
+async def on_guild_remove(guild):
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    # To remove the member from the database
+    print("Removed from guild")
+    print(guild)
+    #cur.execute("DELETE from DISCORDBOT server='%s';" % (str(member.guild)))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 
 
