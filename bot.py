@@ -43,7 +43,8 @@ try:
 except:
     pass
 
-client = discord.Client()
+intents = discord.Intents.all()
+client = discord.Client(intents=intents)
 
 
 @client.event
