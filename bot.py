@@ -108,7 +108,7 @@ async def on_message(message):
 
     elif str(message.content)[:7] == "!msgcnt":
         username = str(message.content)[8:].strip()
-        cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' and username = '%s" % (str(message.channel.name), str(message.guild), str(username)))
+        cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' and username = '%s'" % (str(message.channel.name), str(message.guild), str(username)))
         rows = cur.fetchall()
         for i in rows:
             await message.channel.send(f"{i[0]}: {i[1]}, Last msg posted on {i[2]}")
