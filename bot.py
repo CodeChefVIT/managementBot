@@ -145,6 +145,7 @@ async def on_message(message):
                 cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                 print("Rows with messages from a role deleted in MESSAGES table")
                 conn.commit()
+        await message.channel.send(f"Message made by users having the role {role_del} in this channel has been deleted ")
 
 
     elif str(message.content)[:4] == "!del":      # To delete messages
@@ -209,6 +210,7 @@ async def on_message(message):
                         cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                         print("Rows with messages for a week deleted in MESSAGES table")
                         conn.commit()
+            await message.channel.send(f"Messages for the first week in this channel has been deleted")
 
         elif str(message.content)[5:] == "month":     # To delete messages in the starting month
             for row in rows:
@@ -223,12 +225,14 @@ async def on_message(message):
                     cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                     print("Rows with messages for a month deleted in MESSAGES table")
                     conn.commit()
+            await message.channel.send(f"Messages for the first month in this channel has been deleted")
 
     elif str(message.content[:6]) == "!email":       # Add the emails of the members
         email_add=message.content[6:]
         email_add=email_add.strip()
         cur.execute("UPDATE DISCORDBOT set EMAIL = '%s' where channel = '%s' and username = '%s' and server = '%s' " % (str(email_add), str(message.channel.name), str(message.author.name),str(message.guild)))
         print("Email of a person updated in DISCORDBOT table")
+        await message.channel.send(f"Email for the user {message.author.name} has been added in this channel")
         conn.commit()
 
 
