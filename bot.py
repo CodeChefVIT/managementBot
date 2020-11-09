@@ -108,6 +108,7 @@ async def on_message(message):
 
     elif message.content == "!rstcnt":             # To reset the count of messages of each user in a channel
         cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
+        await message.channel.send(f"Message count for the whole channel {message.channel.name} has been reset ")
         print("A whole channel deleted in DISCORDBOT table")
         conn.commit()
 
@@ -120,12 +121,14 @@ async def on_message(message):
                 cur.execute("DELETE from DISCORDBOT where channel = '%s' and server = '%s' and username='%s' and date='%s' and roles='%s'" % (str(message.channel.name),str(message.guild),str(i[0]),str(i[2]),str(i[-1])))
                 print("Rows containing a specific role deleted in DISCORDBOT table")
                 conn.commit()
+        await message.channel.send(f"Message count for the role {role} in the channel {message.channel.name} has been reset ")
 
     elif str(message.content)[:12] == "!rstcnt user":      # To reset the count of messages of for the specified role in a channel
         username=str(message.content)[13:].strip()
         cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' and username = '%s'" % (str(message.channel.name),str(message.guild), str(username)))
         print("Row containing a specific user deleted in DISCORDBOT table")
         conn.commit()
+        await message.channel.send(f"Message count for the username {username} int the channel {message.channel.name} has been reset ")
 
     elif str(message.content)[:9] == "!del role":  # Delete messages by the roles
         role_del = str(message.content)[9:]
