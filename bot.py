@@ -58,7 +58,7 @@ async def on_message(message):
     cur = conn.cursor()
 
     role_str=[]
-    role=message.member.roles
+    role=message.author.roles
     for i in role:
         role_str.append(str(i.name))
     if(len(role_str)):
@@ -114,7 +114,7 @@ async def on_message(message):
             for i in rows:
                 await message.channel.send(f"{i[0]}: {i[1]}, Last msg posted on {i[2]}")
             if(len(rows)==0):
-                await message.channel.send(f"Either the number of message by the user {str(username[i].name)} is 0 or the user is not there in the server")
+                await message.channel.send(f"{username.name}: 0, No messages made")
 
 
     elif message.content == "!rstcnt":             # To reset the count of messages of each user in a channel
