@@ -135,13 +135,14 @@ async def on_message(message):
                     cur.execute("DELETE from DISCORDBOT where channel = '%s' and server = '%s' and username='%s' and date='%s' and roles='%s'" % (str(message.channel.name),str(message.guild),str(i[0]),str(i[2]),str(i[-1])))
                     print("Rows containing a specific role deleted in DISCORDBOT table")
                     conn.commit()
-        await message.channel.send(f"Message count for the role {role} in this channel has been reset ")
+        await message.channel.send(f"Message count for the roles mentioned in this channel has been reset ")
 
     elif str(message.content)[:12] == "!rstcnt user":      # To reset the count of messages of for the specified role in a channel
-        username=str(message.content)[13:].strip()
-        cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' and username = '%s'" % (str(message.channel.name),str(message.guild), str(username)))
-        print("Row containing a specific user deleted in DISCORDBOT table")
-        conn.commit()
+        username=message.mentions
+        for j in range(len(username)):
+            cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' and username = '%s'" % (str(message.channel.name),str(message.guild), str(username[j].name)))
+            print("Row containing a specific user deleted in DISCORDBOT table")
+            conn.commit()
         await message.channel.send(f"Message count for the username {username} in this channel has been reset ")
 
     elif str(message.content)[:9] == "!del role":  # Delete messages by the roles
@@ -258,7 +259,7 @@ async def on_message(message):
         embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
         embed.add_field(name="!msgcnt <tag the users>",value="Returns the number of messages sent by the mentioned users")
         embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
-        embed.add_field(name="!rstcnt role <name of the role>",value="Resets the number of messages of each user of that role to Zero")
+        embed.add_field(name="!rstcnt <tag the roles>",value="Resets the number of messages of each user of the mentioned roles to Zero")
         embed.add_field(name="!rstcnt user <name of the user>",value="Resets the number of messages of that user to Zero")
         embed.add_field(name="!online count",value="Returns number of online members present")
         embed.add_field(name="!role count",value="Returns number of members under each role")
