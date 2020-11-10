@@ -53,14 +53,12 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    print(message.mentions)
-
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
 
     role_str=[]
-    role=message.author.roles
+    role=message.member.roles
     for i in role:
         role_str.append(str(i.name))
     if(len(role_str)):
