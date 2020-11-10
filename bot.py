@@ -255,7 +255,7 @@ async def on_message(message):
         embed.add_field(name="!del week",value="Deletes the messages in the starting week")
         embed.add_field(name="!del month",value="Deletes the messages in the starting month")
         embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
-        embed.add_field(name="!msgcnt <tag the users>",value="Returns the number of messages sent by the specified users")
+        embed.add_field(name="!msgcnt <name of the user>",value="Returns the number of messages sent by the specified user")
         embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
         embed.add_field(name="!rstcnt role <name of the role>",value="Resets the number of messages of each user of that role to Zero")
         embed.add_field(name="!rstcnt user <name of the user>",value="Resets the number of messages of that user to Zero")
