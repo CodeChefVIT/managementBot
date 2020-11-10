@@ -108,13 +108,13 @@ async def on_message(message):
 
     elif str(message.content)[:7] == "!msgcnt":
         username = message.mentions
-        for i in range(len(username)):
-            cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' and username = '%s'" % (str(message.channel.name), str(message.guild), str(username[i].name)))
+        for j in range(len(username)):
+            cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' and username = '%s'" % (str(message.channel.name), str(message.guild), str(username[j].name)))
             rows = cur.fetchall()
             for i in rows:
                 await message.channel.send(f"{i[0]}: {i[1]}, Last msg posted on {i[2]}")
             if(len(rows)==0):
-                await message.channel.send(f"{username[i].name}: 0, No messages made")
+                await message.channel.send(f"{username[j].name}: 0, No messages made")
 
 
     elif message.content == "!rstcnt":             # To reset the count of messages of each user in a channel
