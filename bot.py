@@ -259,7 +259,7 @@ async def on_message(message):
         embed.add_field(name="!msgcnt <tag the users>",value="Returns the number of messages sent by the mentioned users")
         embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
         embed.add_field(name="!rstcnt <tag the roles>",value="Resets the number of messages of each user of the mentioned roles to Zero")
-        embed.add_field(name="!rstcnt user <name of the user>",value="Resets the number of messages of that user to Zero")
+        embed.add_field(name="!rstcnt <name of the user>",value="Resets the number of messages of the mentioned users to Zero")
         embed.add_field(name="!online count",value="Returns number of online members present")
         embed.add_field(name="!role count",value="Returns number of members under each role")
         await message.channel.send(content=None, embed=embed)
