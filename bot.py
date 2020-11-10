@@ -124,7 +124,7 @@ async def on_message(message):
         conn.commit()
 
     elif str(message.content)[:7] == "!rstcnt":      # To reset the count of messages of for the specified role in a channel
-        role=message.mentions
+        role=message.role_mentions
         print(role)
         #cur.execute("SELECT username, msgcnt, date, roles from DISCORDBOT where channel = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
         #rows = cur.fetchall()
