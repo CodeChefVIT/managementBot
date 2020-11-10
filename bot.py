@@ -53,6 +53,8 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
+    print(message.mentions)
+
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
