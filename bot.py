@@ -245,7 +245,7 @@ async def on_message(message):
                 conn.commit()
         await message.channel.send(f"Messages for the first month in this channel has been deleted")
 
-elif str(message.content)[:4] == "!del":  # Delete messages by the roles
+    elif str(message.content)[:4] == "!del":  # Delete messages by the roles
         role_del = message.role_mentions
         cur.execute("SELECT channel, msgid, date, roles from MESSAGES where channel='%s' and server='%s' " % (str(message.channel.name),str(message.guild)))
         rows = cur.fetchall()
@@ -274,14 +274,14 @@ elif str(message.content)[:4] == "!del":  # Delete messages by the roles
         embed = discord.Embed(title="Help on BOT", description="Some useful commands")
         embed.add_field(name="!users",value="Returns the number of users in the channel")
         embed.add_field(name="!email <email id>",value="Sends an email when a pull request is made")
-        embed.add_field(name="!del role <name of role>",value="Deletes the messages by members of the specified role")
+        embed.add_field(name="!del <tag the roles>",value="Deletes the messages by members of the tagged roles")
         embed.add_field(name="!del week",value="Deletes the messages in the starting week")
         embed.add_field(name="!del month",value="Deletes the messages in the starting month")
         embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
-        embed.add_field(name="!msgcnt <tag the users>",value="Returns the number of messages sent by the mentioned users")
+        embed.add_field(name="!msgcnt <tag the users>",value="Returns the number of messages sent by the tagged users")
         embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
-        embed.add_field(name="!rstcnt <tag the roles>",value="Resets the number of messages of each user of the mentioned roles to Zero")
-        embed.add_field(name="!rstcnt <name of the user>",value="Resets the number of messages of the mentioned users to Zero")
+        embed.add_field(name="!rstcnt <tag the roles>",value="Resets the number of messages of each user of the tagged roles to Zero")
+        embed.add_field(name="!rstcnt <name of the user>",value="Resets the number of messages of the tagged users to Zero")
         embed.add_field(name="!online count",value="Returns number of online members present")
         embed.add_field(name="!role count",value="Returns number of members under each role")
         await message.channel.send(content=None, embed=embed)
