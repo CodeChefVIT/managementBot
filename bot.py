@@ -143,23 +143,8 @@ async def on_message(message):
             conn.commit()
         await message.channel.send(f"Message count for the usernames mentioned in this channel has been reset ")
 
-    elif str(message.content)[:9] == "!del role":  # Delete messages by the roles
-        role_del = message.role_mentions
-        cur.execute("SELECT channel, msgid, date, roles from MESSAGES where channel='%s' and server='%s' " % (str(message.channel.name),str(message.guild)))
-        rows = cur.fetchall()
-        for row in rows:
-            for j in role_del:
-                list_split=str(row[3]).split("!.#$%")
-                if str(j.name) in list_split:
-                    messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
-                    await messages.delete(delay=None)
-                    cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
-                    print("Rows with messages from a role deleted in MESSAGES table")
-                    conn.commit()
-        await message.channel.send(f"Message made by users having the mentioned roles in this channel has been deleted ")
 
-
-    elif str(message.content)[:4] == "!del":      # To delete messages
+    elif str(message.content) == "!del week":      # To delete messages in the starting week
         cur.execute("SELECT channel, msgid, date from MESSAGES where channel='%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
         rows = cur.fetchall()
         a=9999
@@ -183,60 +168,98 @@ async def on_message(message):
                     if(c>c1):
                         c=c1
 
-        if str(message.content)[5:] == "week":   # To delete messages in the starting week
-            for row in rows:
-                d=row[2]
-                a1,b1,c1=str(d).split("-")
-                a1=int(a1)
-                b1=int(b1)
-                c1=int(c1)
-                if(0<=c and c<=7):
-                    if(a1==a and b1==b and 0<=c1 and c1<=7):
-                        messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
-                        await messages.delete(delay=None)
-                        cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
-                        print("Rows with messages for a week deleted in MESSAGES table")
-                        conn.commit()
-
-                elif(8<=c and c<=14):
-                    if(a1==a and b1==b and 8<=c1 and c1<=14):
-                        messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
-                        await messages.delete(delay=None)
-                        cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
-                        print("Rows with messages for a week deleted in MESSAGES table")
-                        conn.commit()
-
-                elif(15<=c and c<=21):
-                    if(a1==a and b1==b and 15<=c1 and c1<=21):
-                        messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
-                        await messages.delete(delay=None)
-                        cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
-                        print("Rows with messages for a week deleted in MESSAGES table")
-                        conn.commit()
-
-                elif(22<=c and c<=31):
-                    if(a1==a and b1==b and 22<=c1 and c1<=31):
-                        messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
-                        await messages.delete(delay=None)
-                        cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
-                        print("Rows with messages for a week deleted in MESSAGES table")
-                        conn.commit()
-            await message.channel.send(f"Messages for the first week in this channel has been deleted")
-
-        elif str(message.content)[5:] == "month":     # To delete messages in the starting month
-            for row in rows:
-                d=row[2]
-                a1,b1,c1=str(d).split("-")
-                a1=int(a1)
-                b1=int(b1)
-                c1=int(c1)
-                if(a1==a and b1==b):
+        for row in rows:
+            d=row[2]
+            a1,b1,c1=str(d).split("-")
+            a1=int(a1)
+            b1=int(b1)
+            c1=int(c1)
+            if(0<=c and c<=7):
+                if(a1==a and b1==b and 0<=c1 and c1<=7):
                     messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
                     await messages.delete(delay=None)
                     cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
-                    print("Rows with messages for a month deleted in MESSAGES table")
+                    print("Rows with messages for a week deleted in MESSAGES table")
                     conn.commit()
-            await message.channel.send(f"Messages for the first month in this channel has been deleted")
+
+            elif(8<=c and c<=14):
+                if(a1==a and b1==b and 8<=c1 and c1<=14):
+                    messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
+                    await messages.delete(delay=None)
+                    cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                    print("Rows with messages for a week deleted in MESSAGES table")
+                    conn.commit()
+
+            elif(15<=c and c<=21):
+                if(a1==a and b1==b and 15<=c1 and c1<=21):
+                    messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
+                    await messages.delete(delay=None)
+                    cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                    print("Rows with messages for a week deleted in MESSAGES table")
+                    conn.commit()
+
+            elif(22<=c and c<=31):
+                if(a1==a and b1==b and 22<=c1 and c1<=31):
+                    messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
+                    await messages.delete(delay=None)
+                    cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                    print("Rows with messages for a week deleted in MESSAGES table")
+                    conn.commit()
+        await message.channel.send(f"Messages for the first week in this channel has been deleted")
+
+    elif str(message.content) == "!del month":      # To delete messages in the starting month
+        cur.execute("SELECT channel, msgid, date from MESSAGES where channel='%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
+        rows = cur.fetchall()
+        a=9999
+        b=9999
+        c=9999
+        for i in rows:
+            d=i[2]
+            a1,b1,c1=str(d).split("-")
+            a1=int(a1)
+            b1=int(b1)
+            c1=int(c1)
+            if(a>a1):
+                a=a1
+                b=b1
+                c=c1
+            elif(a==a1):
+                if(b>b1):
+                    b=b1
+                    c=c1
+                elif(b==b1):
+                    if(c>c1):
+                        c=c1
+
+        for row in rows:
+            d=row[2]
+            a1,b1,c1=str(d).split("-")
+            a1=int(a1)
+            b1=int(b1)
+            c1=int(c1)
+            if(a1==a and b1==b):
+                messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
+                await messages.delete(delay=None)
+                cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                print("Rows with messages for a month deleted in MESSAGES table")
+                conn.commit()
+        await message.channel.send(f"Messages for the first month in this channel has been deleted")
+
+elif str(message.content)[:4] == "!del":  # Delete messages by the roles
+        role_del = message.role_mentions
+        cur.execute("SELECT channel, msgid, date, roles from MESSAGES where channel='%s' and server='%s' " % (str(message.channel.name),str(message.guild)))
+        rows = cur.fetchall()
+        for row in rows:
+            for j in role_del:
+                list_split=str(row[3]).split("!.#$%")
+                if str(j.name) in list_split:
+                    messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
+                    await messages.delete(delay=None)
+                    cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                    print("Rows with messages from a role deleted in MESSAGES table")
+                    conn.commit()
+        await message.channel.send(f"Message made by users having the mentioned roles in this channel has been deleted ")
+
 
     elif str(message.content[:6]) == "!email":       # Add the emails of the members
         email_add=message.content[6:]
