@@ -156,7 +156,7 @@ async def on_message(message):
                     cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
                     print("Rows with messages from a role deleted in MESSAGES table")
                     conn.commit()
-        await message.channel.send(f"Message made by users having the role {role_del} in this channel has been deleted ")
+        await message.channel.send(f"Message made by users having the mentioned roles in this channel has been deleted ")
 
 
     elif str(message.content)[:4] == "!del":      # To delete messages
