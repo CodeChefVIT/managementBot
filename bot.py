@@ -125,13 +125,12 @@ async def on_message(message):
 
     elif str(message.content)[:7] == "!rstcnt":      # To reset the count of messages of for the specified role in a channel
         role=message.role_mentions
-        print(role)
         cur.execute("SELECT username, msgcnt, date, roles from DISCORDBOT where channel = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
         rows = cur.fetchall()
         for i in rows:
             for j in role:
                 list_split=str(i[-1]).split("!.#$%")
-                if(j.name in list_split):
+                if(str(j.name) in list_split):
                     cur.execute("DELETE from DISCORDBOT where channel = '%s' and server = '%s' and username='%s' and date='%s' and roles='%s'" % (str(message.channel.name),str(message.guild),str(i[0]),str(i[2]),str(i[-1])))
                     print("Rows containing a specific role deleted in DISCORDBOT table")
                     conn.commit()
@@ -145,18 +144,18 @@ async def on_message(message):
         await message.channel.send(f"Message count for the usernames mentioned in this channel has been reset ")
 
     elif str(message.content)[:9] == "!del role":  # Delete messages by the roles
-        role_del = str(message.content)[9:]
-        role_del = role_del.strip()
+        role_del = message.role_mentions
         cur.execute("SELECT channel, msgid, date, roles from MESSAGES where channel='%s' and server='%s' " % (str(message.channel.name),str(message.guild)))
         rows = cur.fetchall()
         for row in rows:
-            list_split=str(row[3]).split("!.#$%")
-            if str(role_del) in list_split:
-                messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
-                await messages.delete(delay=None)
-                cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
-                print("Rows with messages from a role deleted in MESSAGES table")
-                conn.commit()
+            for j in role_del:
+                list_split=str(row[3]).split("!.#$%")
+                if str(j.name) in list_split:
+                    messages=await message.channel.fetch_message(int(decrypt_string(str(row[1]))))
+                    await messages.delete(delay=None)
+                    cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild),str(message.channel.name)))
+                    print("Rows with messages from a role deleted in MESSAGES table")
+                    conn.commit()
         await message.channel.send(f"Message made by users having the role {role_del} in this channel has been deleted ")
 
 
