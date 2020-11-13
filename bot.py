@@ -56,7 +56,8 @@ async def on_message(message):
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
-
+    print(message.guild)
+    print(message.guild.id,message.author.id,message.channel.id)
     role_str=[]
     role=message.author.roles
     for i in role:
@@ -97,8 +98,10 @@ async def on_message(message):
         conn.commit()
         print("Saved to DB")
 
+
     if message.content == "!users":                 # To find number of users in the channel 
         await message.channel.send(f"# of Members: {message.guild.member_count}")
+
 
     elif message.content == "!msgcnt":              # To find number of messages sent by each users
         cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' " % (str(message.channel.name),str(message.guild)))
