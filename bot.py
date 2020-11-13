@@ -406,8 +406,15 @@ async def on_guild_remove(guild):
 
 @client.event
 async def on_guild_channel_update(before, after):
-    print(before)
-    print(after)
+    print(str(after.name)+str(after.id), str(before.guild)+str(before.id))
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    cur.execute("UPDATE DISCORDBOT set channel = '%s' where server = '%s' " % (str(after.name)+str(after.id), str(before.guild)+str(before.id)))
+    print("channel is updated DISCORDBOT table")
+    conn.commit()
+    cur.close()
+    conn.close()
 
 
 client.run(config('token'))
