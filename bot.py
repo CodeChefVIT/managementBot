@@ -79,6 +79,7 @@ async def on_message(message):
         if(len(rows)):
             flag=0
             for row in rows:
+                print(row[0]==message.channel.name,row[1]==message.author.name,row[4]==str(message.author.id))
                 if(row[0]==message.channel.name and row[1]==message.author.name and row[4]==str(message.author.id)):
                     flag=1
                     print(message.author.name,message.channel.name,int(row[2])+1,date.today())
