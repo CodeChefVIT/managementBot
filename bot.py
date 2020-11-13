@@ -413,6 +413,9 @@ async def on_guild_channel_update(before, after):
     cur.execute("UPDATE DISCORDBOT set CHANNEL = '%s' where server = '%s' " % (str(after.name)+str(after.id), str(before.guild)+str(before.guild.id)))
     print("channel is updated DISCORDBOT table")
     conn.commit()
+    cur.execute("UPDATE MESSAGES set CHANNEL = '%s' where server = '%s' " % (str(after.name)+str(after.id), str(before.guild)+str(before.guild.id)))
+    print("channel is updated MESSAGES table")
+    conn.commit()
     cur.close()
     conn.close()
 
