@@ -404,5 +404,10 @@ async def on_guild_remove(guild):
     conn.close()
 
 
+@client.event
+async def on_guild_channel_update(before, after):
+    print(before)
+    print(after)
+
 
 client.run(config('token'))
