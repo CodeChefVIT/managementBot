@@ -136,14 +136,16 @@ async def on_message(message):
                     cur.execute("DELETE from DISCORDBOT where channel = '%s' and server = '%s' and username='%s' and date='%s' and roles='%s'" % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id),str(i[0]),str(i[2]),str(i[-1])))
                     print("Rows containing a specific role deleted in DISCORDBOT table")
                     conn.commit()
-        await message.channel.send(f"Message count for the roles mentioned in this channel has been reset ")
+        if(len(role)):
+            await message.channel.send(f"Message count for the roles mentioned in this channel has been reset ")
 
         username=message.mentions
         for j in range(len(username)):
             cur.execute("DELETE from DISCORDBOT where CHANNEL = '%s' and server = '%s' and username = '%s' and userid = '%s'" % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id), str(username[j].name), str(username[j].id)))
             print("Row containing a specific user deleted in DISCORDBOT table")
             conn.commit()
-        await message.channel.send(f"Message count for the usernames mentioned in this channel has been reset ")
+        if(len(username)):
+            await message.channel.send(f"Message count for the usernames mentioned in this channel has been reset ")
 
 
     elif str(message.content) == "!del week":      # To delete messages in the starting week
