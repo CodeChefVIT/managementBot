@@ -262,7 +262,8 @@ async def on_message(message):
                     cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild)+str(message.guild.id),str(message.channel.name)+str(message.channel.id)))
                     print("Rows with messages from a role deleted in MESSAGES table")
                     conn.commit()
-        await message.channel.send(f"Message made by users having the mentioned roles in this channel has been deleted ")
+        if(len(role_del)):
+            await message.channel.send(f"Message made by users having the mentioned roles in this channel has been deleted ")
 
 
     elif str(message.content[:6]) == "!email":       # Add the emails of the members
@@ -419,5 +420,35 @@ async def on_guild_channel_update(before, after):
     cur.close()
     conn.close()
 
+
+@client.event
+async def on_private_channel_update(before, after):
+    print(str(after.name)+str(after.id), str(before.guild)+str(before.id))
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    cur.execute("UPDATE DISCORDBOT set CHANNEL = '%s' where server = '%s' " % (str(after.name)+str(after.id), str(before.guild)+str(before.guild.id)))
+    print("channel is updated DISCORDBOT table")
+    conn.commit()
+    cur.execute("UPDATE MESSAGES set CHANNEL = '%s' where server = '%s' " % (str(after.name)+str(after.id), str(before.guild)+str(before.guild.id)))
+    print("channel is updated MESSAGES table")
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+@client.event
+async def on_member_update(before, after):
+    print(after.roles)
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    role_str=[]
+    role=after.roles
+    for i in role:
+        role_str.append(str(i.name))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 client.run(config('token'))
