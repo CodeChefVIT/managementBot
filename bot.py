@@ -251,6 +251,7 @@ async def on_message(message):
 
     elif str(message.content)[:4] == "!del":  # Delete messages by the roles
         role_del = message.role_mentions
+        print(role_del)
         cur.execute("SELECT channel, msgid, date, roles from MESSAGES where channel='%s' and server='%s' " % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id)))
         rows = cur.fetchall()
         for row in rows:
@@ -439,9 +440,6 @@ async def on_private_channel_update(before, after):
 
 @client.event
 async def on_member_update(before, after):
-    print(after.roles,after.guild)
-    print(after.name)
-    print(after.id)
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
@@ -452,8 +450,17 @@ async def on_member_update(before, after):
     cur.execute("UPDATE DISCORDBOT set ROLES = '%s' where server = '%s' and username = '%s' and userid = '%s'" % (str("!.#$%".join(role_str)), str(before.guild)+str(before.guild.id), str(after.name), str(after.id)))
     print("roles is updated DISCORDBOT table")
     conn.commit()
-    cur.execute("UPDATE MESSAGES set ROLES = '%s' where server = '%s' " % (str("!.#$%".join(role_str)), str(before.guild)+str(before.guild.id)))
-    print("roles is updated MESSAGES table")
+    cur.close()
+    conn.close()
+
+
+@client.event
+async def on_user_update(before, after):
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    cur.execute("UPDATE DISCORDBOT set USERNAME = '%s' where server = '%s' and username = '%s' and userid = '%s'" % (str(after.name), str(before.guild)+str(before.guild.id), str(before.name), str(before.id)))
+    print("roles is updated DISCORDBOT table")
     conn.commit()
     cur.close()
     conn.close()
