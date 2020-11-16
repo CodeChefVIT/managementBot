@@ -460,7 +460,7 @@ async def on_user_update(before, after):
     print ("Opened database successfully")
     print(str(after.name), str(before.name), str(before.id))
     cur = conn.cursor()
-    cur.execute("UPDATE DISCORDBOT set USERNAME = '%s' where username = '%s' and userid = '%s'" % (str(after.name), str(before.guild)+str(before.guild.id), str(before.name), str(before.id)))
+    cur.execute("UPDATE DISCORDBOT set USERNAME = '%s' where username = '%s' and userid = '%s'" % (str(after.name), str(before.name), str(before.id)))
     print("roles is updated DISCORDBOT table")
     conn.commit()
     cur.close()
