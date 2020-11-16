@@ -449,6 +449,11 @@ async def on_member_update(before, after):
     role=after.roles
     for i in role:
         role_str.append(str(i.name))
+    cur.execute("UPDATE DISCORDBOT set ROLES = '%s' where server = '%s' and username = '%s' and userid = '%s'" % (str("!.#$%".join(role_str)), str(before.guild)+str(before.guild.id), str(after.name), str(after.id)))
+    print("roles is updated DISCORDBOT table")
+    conn.commit()
+    cur.execute("UPDATE MESSAGES set ROLES = '%s' where server = '%s' " % (str("!.#$%".join(role_str)), str(before.guild)+str(before.guild.id)))
+    print("roles is updated MESSAGES table")
     conn.commit()
     cur.close()
     conn.close()
