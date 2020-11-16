@@ -458,7 +458,7 @@ async def on_member_update(before, after):
 async def on_user_update(before, after):
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
-    print(str(after.name), str(before.guild)+str(before.guild.id), str(before.name), str(before.id)))
+    print(str(after.name), str(before.guild)+str(before.guild.id), str(before.name), str(before.id))
     cur = conn.cursor()
     cur.execute("UPDATE DISCORDBOT set USERNAME = '%s' where server = '%s' and username = '%s' and userid = '%s'" % (str(after.name), str(before.guild)+str(before.guild.id), str(before.name), str(before.id)))
     print("roles is updated DISCORDBOT table")
