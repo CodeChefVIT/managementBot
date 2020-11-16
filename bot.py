@@ -440,6 +440,8 @@ async def on_private_channel_update(before, after):
 @client.event
 async def on_member_update(before, after):
     print(after.roles,after.guild)
+    print(after.name)
+    print(after.user)
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
