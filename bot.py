@@ -349,12 +349,12 @@ async def on_message(message):
     conn.close()
 
 
+# To remove the member from the database
 @client.event
 async def on_member_remove(member):
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
-    # To remove the member from the database
     print("Member removed part")
     print(str(member.name),str(member.guild))
     cur.execute("DELETE from DISCORDBOT where USERNAME='%s' and server='%s' and userid = '%s';" % (str(member.name),str(member.guild)+str(member.guild.id),str(member.id)))
@@ -363,12 +363,12 @@ async def on_member_remove(member):
     conn.close()
 
 
+# To remove this channel from the database
 @client.event
 async def on_private_channel_delete(channel):
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
-    # To remove this channel from the database
     cur.execute("DELETE from DISCORDBOT where channel='%s' and server='%s';" % (str(channel.name)+str(channel.id),str(channel.guild)+str(channel.guild.id)))
     conn.commit()
     cur.execute("DELETE from MESSAGES where channel='%s' and server='%s';" % (str(channel.name)+str(channel.id),str(channel.guild)+str(channel.guild.id)))
@@ -377,12 +377,12 @@ async def on_private_channel_delete(channel):
     conn.close()
 
 
+# To remove this channel from the database
 @client.event
 async def on_guild_channel_delete(channel):
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
-    # To remove this channel from the database
     cur.execute("DELETE from DISCORDBOT where channel='%s' and server='%s';" % (str(channel.name)+str(channel.id),str(channel.guild)+str(channel.guild.id)))
     conn.commit()
     cur.execute("DELETE from MESSAGES where channel='%s' and server='%s';" % (str(channel.name)+str(channel.id),str(channel.guild)+str(channel.guild.id)))
@@ -391,12 +391,12 @@ async def on_guild_channel_delete(channel):
     conn.close()
 
 
+# To remove the server from the database
 @client.event
 async def on_guild_remove(guild):
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
-    # To remove the member from the database
     print("Removed from guild")
     cur.execute("DELETE from DISCORDBOT where server='%s';" % (str(guild)+str(guild.id)))
     conn.commit()
@@ -406,6 +406,7 @@ async def on_guild_remove(guild):
     conn.close()
 
 
+# To update the channel in the database
 @client.event
 async def on_guild_channel_update(before, after):
     print(str(after.name)+str(after.id), str(before.guild)+str(before.id))
@@ -422,6 +423,7 @@ async def on_guild_channel_update(before, after):
     conn.close()
 
 
+# To update the channel in the database
 @client.event
 async def on_private_channel_update(before, after):
     print(str(after.name)+str(after.id), str(before.guild)+str(before.id))
@@ -438,6 +440,7 @@ async def on_private_channel_update(before, after):
     conn.close()
 
 
+# To update the member in the database
 @client.event
 async def on_member_update(before, after):
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
@@ -454,6 +457,7 @@ async def on_member_update(before, after):
     conn.close()
 
 
+# To update the member in the database
 @client.event
 async def on_user_update(before, after):
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
@@ -465,5 +469,22 @@ async def on_user_update(before, after):
     conn.commit()
     cur.close()
     conn.close()
+
+
+# To update the channel in the database
+@client.event
+async def on_guild_update(before, after):   
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    cur.execute("UPDATE DISCORDBOT set CHANNEL = '%s' where server = '%s' " % (str(after.name)+str(after.id), str(before.guild)+str(before.guild.id)))
+    print("channel is updated DISCORDBOT table")
+    conn.commit()
+    cur.execute("UPDATE MESSAGES set CHANNEL = '%s' where server = '%s' " % (str(after.name)+str(after.id), str(before.guild)+str(before.guild.id)))
+    print("channel is updated MESSAGES table")
+    conn.commit()
+    cur.close()
+    conn.close()
+
 
 client.run(config('token'))
