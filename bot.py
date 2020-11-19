@@ -288,11 +288,11 @@ async def on_message(message):
         embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
         embed.add_field(name="!rstcnt <tag the roles>",value="Resets the number of messages of each user of the tagged roles to Zero")
         embed.add_field(name="!rstcnt <name of the user>",value="Resets the number of messages of the tagged users to Zero")
-        embed.add_field(name="!online count",value="Returns number of online members present")
-        embed.add_field(name="!role count",value="Returns number of members under each role")
+        embed.add_field(name="!online",value="Returns number of online members present")
+        embed.add_field(name="!role",value="Returns number of members under each role")
         await message.channel.send(content=None, embed=embed)
 
-    elif message.content == "!online count":        # To find out number of online members
+    elif message.content == "!online":        # To find out number of online members
 
         list_members = message.guild.members
         count_online_members = message.guild.member_count
@@ -302,7 +302,7 @@ async def on_message(message):
         
         await message.channel.send(f"# of Online Members: {count_online_members}")       
 
-    elif message.content == "!role count":         # To find out number of members under each role
+    elif message.content == "!role":         # To find out number of members under each role
 
         list_members = message.guild.members
         roles_count = {}
