@@ -339,7 +339,7 @@ async def on_message(message):
 
             msg = f"Subject: {subject}\n\n{body}"
 
-            cur.execute("SELECT email from DISCORDBOT where channel='%s' and server='%s'" % (str(message.channel.name),str(message.guild)))
+            cur.execute("SELECT email from DISCORDBOT where channel='%s' and server='%s'" % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id)))
             rows = cur.fetchall()
             for i in rows:
                 if(i[0]!="Not Updated"):
