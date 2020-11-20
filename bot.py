@@ -82,7 +82,7 @@ async def on_message(message):
         role=message.author.roles
         for i in role:
             role_str.append(str(i.name))
-        cur.execute("SELECT channel, username, msgcnt, email, userid from DISCORDBOT where server='%s'" % (str(message.guild)+str(message.guild.id)))
+        cur.execute("SELECT channel, username, msgcnt, email, userid from DISCORDBOT where server=''%s''" % (str(message.guild)+str(message.guild.id)))
         rows = cur.fetchall()
         if(len(rows)):
             flag=0
@@ -294,7 +294,7 @@ async def on_message(message):
         embed.add_field(name="!email <email id>",value="Sends an email when a pull request is made")
         embed.add_field(name="!del <tag the roles>",value="Deletes the messages by members of the tagged roles")
         embed.add_field(name="!del week",value="Deletes the messages in the starting week")
-        embed.add_field(name="!del month",value="Deletes the messages in the starting month")
+        embed.add_field(name="!del month <Month number>",value="Deletes the messages in the starting month + the month number")
         embed.add_field(name="!msgcnt",value="Returns the number of messages sent by each user")
         embed.add_field(name="!msgcnt <tag the users>",value="Returns the number of messages sent by the tagged users")
         embed.add_field(name="!rstcnt",value="Resets the number of messages of each user to Zero")
