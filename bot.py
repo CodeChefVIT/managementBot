@@ -341,9 +341,11 @@ async def on_message(message):
 
             cur.execute("SELECT email from DISCORDBOT where channel='%s' and server='%s'" % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id)))
             rows = cur.fetchall()
+            print(i)
             for i in rows:
                 if(i[0]!="Not Updated"):
                     smtp.sendmail(EMAIL_ADDRESS,i[0],msg)
+                    print("Email sent")
     conn.commit()
     cur.close()
     conn.close()
