@@ -82,7 +82,7 @@ async def on_message(message):
         role=message.author.roles
         for i in role:
             role_str.append(str(i.name))
-        cur.execute(r"SELECT channel, username, msgcnt, email, userid from DISCORDBOT where server=%s " % (str(message.guild)+str(message.guild.id)))
+        cur.execute("SELECT channel, username, msgcnt, email, userid from DISCORDBOT where server='%s'" % (str(message.guild)+str(message.guild.id)))
         rows = cur.fetchall()
         if(len(rows)):
             flag=0
