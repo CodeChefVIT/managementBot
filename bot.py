@@ -216,7 +216,7 @@ async def on_message(message):
         await message.channel.send(f"Messages for the first week in this channel has been deleted")
 
     elif str(message.content)[:10] == "!del month":      # To delete messages in the starting month
-        month_no=int("0"+str(message.content)[10:])
+        month_no=int("0"+(str(message.content)[10:]).strip())
         cur.execute("SELECT channel, msgid, date from MESSAGES where channel='%s' and server = '%s' " % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id)))
         rows = cur.fetchall()
         a=9999
