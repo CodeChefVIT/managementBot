@@ -320,7 +320,8 @@ async def on_message(message):
             else:
                 await message.channel.send(f"{str(i.name)} :- {roles_count[i]}")
 
-
+    print("GitHub" in str(message.author.name))
+    print(message.author.bot)
     if ("GitHub" in str(message.author.name) and message.author.bot):      #To send emails when a Github Pull request is made
         print("in")
         with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
