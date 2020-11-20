@@ -332,6 +332,7 @@ async def on_message(message):
             smtp.ehlo()
             smtp.starttls()
             smtp.ehlo()
+            print(EMAIL_ADDRESS)
 
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
