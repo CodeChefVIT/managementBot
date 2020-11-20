@@ -58,6 +58,7 @@ async def on_message(message):
     print ("Opened database successfully")
     cur = conn.cursor()
     role_str=[]
+    role=[]
     try:
         role=message.author.roles
     except:
