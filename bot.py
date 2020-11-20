@@ -215,7 +215,8 @@ async def on_message(message):
                     conn.commit()
         await message.channel.send(f"Messages for the first week in this channel has been deleted")
 
-    elif str(message.content) == "!del month":      # To delete messages in the starting month
+    elif str(message.content)[:10] == "!del month":      # To delete messages in the starting month
+        month_no=int("0"+str(message.content)[10:])
         cur.execute("SELECT channel, msgid, date from MESSAGES where channel='%s' and server = '%s' " % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id)))
         rows = cur.fetchall()
         a=9999
@@ -239,6 +240,9 @@ async def on_message(message):
                     if(c>c1):
                         c=c1
 
+        b=b+month_no
+        a+=b//12
+        b=(b-1)%12+1
         for row in rows:
             d=row[2]
             a1,b1,c1=str(d).split("-")
@@ -324,15 +328,12 @@ async def on_message(message):
             else:
                 await message.channel.send(f"{str(i.name)} :- {roles_count[i]}")
 
-    print("GitHub" in str(message.author.name))
-    print(message.author.bot)
     if ("GitHub" in str(message.author.name) and message.author.bot):      #To send emails when a Github Pull request is made
-        print("in")
+
         with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
             smtp.ehlo()
             smtp.starttls()
             smtp.ehlo()
-            print(EMAIL_ADDRESS)
 
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
@@ -347,7 +348,6 @@ async def on_message(message):
 
             cur.execute("SELECT email from DISCORDBOT where channel='%s' and server='%s'" % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id)))
             rows = cur.fetchall()
-            print(i)
             for i in rows:
                 if(i[0]!="Not Updated"):
                     smtp.sendmail(EMAIL_ADDRESS,i[0],msg)
