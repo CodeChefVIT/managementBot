@@ -69,6 +69,10 @@ async def on_message(message):
         cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE,ROLES) VALUES (%s,%s,%s,%s,%s)", (str(message.guild)+str(message.guild.id),str(message.channel.name)+str(message.channel.id), str(encrypt_string(str(message.id))), str(date.today()), str("!.#$%".join(role_str))))
         print("(server,channel,MSGID,DATE,ROLES) inserted in messages table")
         conn.commit()
+    else:
+        cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE) VALUES (%s,%s,%s,%s)", (str(message.guild)+str(message.guild.id),str(message.channel.name)+str(message.channel.id), str(encrypt_string(str(message.id))), str(date.today()) ))
+        print("(server,channel,MSGID,DATE) inserted in messages table")
+        conn.commit()
 
     # Counts the number of messages by each member
     if message.author.bot:
@@ -255,7 +259,7 @@ async def on_message(message):
                 cur.execute("DELETE from MESSAGES where MSGID='%s' and server = '%s' and channel = '%s' ;" % (row[1],str(message.guild)+str(message.guild.id),str(message.channel.name)+str(message.channel.id)))
                 print("Rows with messages for a month deleted in MESSAGES table")
                 conn.commit()
-        await message.channel.send(f"Messages for the first month in this channel has been deleted")
+        await message.channel.send(f"Messages for the specified month in this channel has been deleted")
 
     elif str(message.content)[:4] == "!del":  # Delete messages by the roles
         role_del = message.role_mentions
