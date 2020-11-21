@@ -334,7 +334,7 @@ async def on_message(message):
 
     if ("GitHub" in str(message.author.name) and message.author.bot):      #To send emails when a Github Pull request is made
 
-        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        with smtplib.SMTP_SSL('smtp.googlemail.com', 465) as smtp:
             smtp.ehlo()
             smtp.starttls()
             smtp.ehlo()
