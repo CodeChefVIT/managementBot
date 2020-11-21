@@ -334,28 +334,27 @@ async def on_message(message):
 
     if ("GitHub" in str(message.author.name) and message.author.bot):      #To send emails when a Github Pull request is made
 
-        with smtplib.SMTP_SSL('smtp.googlemail.com', 465) as smtp:
-            smtp.ehlo()
-            smtp.starttls()
-            smtp.ehlo()
+        s = smtplib.SMTP('smtp.gmail.com', 587) 
+        s.starttls()
 
-            smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        s.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
-            subject = "An update was made to the git repository"
-            body = "An update was made to the git repository\n\n"
+        subject = "An update was made to the git repository"
+        body = "An update was made to the git repository\n\n"
 
-            for i in message.embeds:
-                body+=i.title+"\n\n"
-                body+=i.description+"\n\n\n\n"
+        for i in message.embeds:
+            body+=i.title+"\n\n"
+            body+=i.description+"\n\n\n\n"
 
-            msg = f"Subject: {subject}\n\n{body}"
+        msg = f"Subject: {subject}\n\n{body}"
 
-            cur.execute("SELECT email from DISCORDBOT where channel='%s' and server='%s'" % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id)))
-            rows = cur.fetchall()
-            for i in rows:
-                if(i[0]!="Not Updated"):
-                    smtp.sendmail(EMAIL_ADDRESS,i[0],msg)
-                    print("Email sent")
+        cur.execute("SELECT email from DISCORDBOT where channel='%s' and server='%s'" % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id)))
+        rows = cur.fetchall()
+        for i in rows:
+            if(i[0]!="Not Updated"):
+                s.sendmail(EMAIL_ADDRESS,i[0],msg)
+                print("Email sent")
+        s.quit() 
     conn.commit()
     cur.close()
     conn.close()
