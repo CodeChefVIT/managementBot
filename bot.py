@@ -342,6 +342,7 @@ async def on_message(message):
 
         list_members = message.guild.members
         roles_count = {}
+        msg=""
         for i in list_members:
             member_roles = i.roles
             for j in member_roles:
@@ -349,12 +350,16 @@ async def on_message(message):
                     roles_count[j]+=1
                 else:
                     roles_count[j]=1
-        await message.channel.send(f"Roles :- Members")
+        msg+=f"Roles :- Members"
+        msg+="\n"
         for i in roles_count.keys():
             if str(i.name)[0]=="@":
-                await message.channel.send(f"{str(i.name)[1:]} :- {roles_count[i]}")
+                msg+=f"{str(i.name)[1:]} :- {roles_count[i]}"
+                msg+="\n"
             else:
-                await message.channel.send(f"{str(i.name)} :- {roles_count[i]}")
+                msg+=f"{str(i.name)} :- {roles_count[i]}"
+                msg+="\n"
+        await message.channel.send(msg)
 
     if ("GitHub" in str(message.author.name) and message.author.bot):      #To send emails when a Github Pull request is made
 
