@@ -12,6 +12,18 @@ from decouple import config
 EMAIL_ADDRESS = config('userid')
 EMAIL_PASSWORD = config('userpass')
 
+def remove_quote(s):
+    s=str(s).split("'")
+    s="".join(s)
+    return s
+
+def remove_quote_id(s,id):
+    s=str(s).split("'")
+    s="".join(s)
+    s=s+str(id)
+    return s
+
+
 try:
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
@@ -54,6 +66,14 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
+    server_insert=remove_quote_id(str(message.guild),str(message.guild.id))
+
+    channel_insert=remove_quote_id(str(message.channel.name),str(message.channel.id))
+
+    username_insert=remove_quote(str(message.author.name))
+
+
+
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
@@ -66,11 +86,11 @@ async def on_message(message):
     for i in role:
         role_str.append(str(i.name))
     if(len(role_str)):
-        cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE,ROLES) VALUES (%s,%s,%s,%s,%s)", (str(message.guild)+str(message.guild.id),str(message.channel.name)+str(message.channel.id), str(encrypt_string(str(message.id))), str(date.today()), str("!.#$%".join(role_str))))
+        cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE,ROLES) VALUES (%s,%s,%s,%s,%s)", (str(server_insert),str(channel_insert), str(encrypt_string(str(message.id))), str(date.today()), str("!.#$%".join(role_str))))
         print("(server,channel,MSGID,DATE,ROLES) inserted in messages table")
         conn.commit()
     else:
-        cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE) VALUES (%s,%s,%s,%s)", (str(message.guild)+str(message.guild.id),str(message.channel.name)+str(message.channel.id), str(encrypt_string(str(message.id))), str(date.today()) ))
+        cur.execute("INSERT INTO MESSAGES (server,channel,MSGID,DATE) VALUES (%s,%s,%s,%s)", (str(server_insert),str(channel_insert), str(encrypt_string(str(message.id))), str(date.today()) ))
         print("(server,channel,MSGID,DATE) inserted in messages table")
         conn.commit()
 
@@ -82,25 +102,23 @@ async def on_message(message):
         role=message.author.roles
         for i in role:
             role_str.append(str(i.name))
-        cur.execute("SELECT channel, username, msgcnt, email, userid from DISCORDBOT where server='%s' " % (str(message.guild)+str(message.guild.id)))
+        cur.execute("SELECT channel, username, msgcnt, email, userid from DISCORDBOT where server='%s' " % (str(server_insert)))
         rows = cur.fetchall()
         if(len(rows)):
             flag=0
             for row in rows:
-                if(row[0]==str(message.channel.name)+str(message.channel.id) and row[1]==message.author.name and row[4]==str(message.author.id)):
+                if(row[0]==str(channel_insert) and row[1]==str(username_insert) and row[4]==str(message.author.id)):
                     flag=1
-                    print(message.author.name,message.channel.name,int(row[2])+1,date.today())
-                    cur.execute("UPDATE DISCORDBOT set MSGCNT = %s, ROLES = %s where CHANNEL = %s and USERNAME = %s and SERVER = %s and USERID = %s", (int(int(row[2])+1), str("!.#$%".join(role_str)), str(message.channel.name)+str(message.channel.id), str(message.author.name),str(message.guild)+str(message.guild.id), str(message.author.id)))
-                    print(message.author.name,message.channel.name,int(row[2])+1,date.today())
+                    cur.execute("UPDATE DISCORDBOT set MSGCNT = %s, ROLES = %s where CHANNEL = %s and USERNAME = %s and SERVER = %s and USERID = %s", (int(int(row[2])+1), str("!.#$%".join(role_str)), str(channel_insert), str(username_insert),str(server_insert), str(message.author.id)))
                     conn.commit()
                     print("Updated Discord bot table")
                     break
             if(flag==0):    
-                cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,USERID,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild)+str(message.guild.id),str(message.channel.name)+str(message.channel.id), str(message.author.name), str(message.author.id), str(date.today()), str("!.#$%".join(role_str))))
+                cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,USERID,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,%s,1,'Not Updated',%s,%s)", (str(server_insert),str(channel_insert), str(username_insert), str(message.author.id), str(date.today()), str("!.#$%".join(role_str))))
                 print("(server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) inserted in DISCORDBOT table")
         
         else:
-            cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,USERID,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,%s,1,'Not Updated',%s,%s)", (str(message.guild)+str(message.guild.id),str(message.channel.name)+str(message.channel.id), str(message.author.name), str(message.author.id), str(date.today()), str("!.#$%".join(role_str))))
+            cur.execute("INSERT INTO DISCORDBOT (server,channel,USERNAME,USERID,MSGCNT,EMAIL,DATE,ROLES) VALUES (%s,%s,%s,%s,1,'Not Updated',%s,%s)", (str(server_insert),str(channel_insert), str(username_insert), str(message.author.id), str(date.today()), str("!.#$%".join(role_str))))
             print("(server,channel,USERNAME,MSGCNT,EMAIL,DATE,ROLES) inserted in DISCORDBOT table")
         conn.commit()
         print("Saved to DB")
@@ -111,7 +129,7 @@ async def on_message(message):
 
 
     elif message.content == "!msgcnt":              # To find number of messages sent by each users
-        cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' " % (str(message.channel.name)+str(message.channel.id),str(message.guild)+str(message.guild.id)))
+        cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' " % (str(channel_insert),str(server_insert)))
         rows = cur.fetchall()
         for i in rows:
             await message.channel.send(f"{i[0]}: {i[1]}, Last msg posted on {i[2]}")
@@ -119,7 +137,7 @@ async def on_message(message):
     elif str(message.content)[:7] == "!msgcnt":
         username = message.mentions
         for j in range(len(username)):
-            cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' and username = '%s' and userid = '%s'" % (str(message.channel.name)+str(message.channel.id), str(message.guild)+str(message.guild.id), str(username[j].name), str(username[j].id)))
+            cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' and username = '%s' and userid = '%s'" % (str(channel_insert), str(server_insert), str(remove_quote(str(username[j].name))), str(username[j].id)))
             rows = cur.fetchall()
             for i in rows:
                 await message.channel.send(f"{i[0]}: {i[1]}, Last msg posted on {i[2]}")
