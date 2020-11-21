@@ -131,8 +131,11 @@ async def on_message(message):
     elif message.content == "!msgcnt":              # To find number of messages sent by each users
         cur.execute("SELECT username, msgcnt, date from DISCORDBOT where channel = '%s' and server = '%s' " % (str(channel_insert),str(server_insert)))
         rows = cur.fetchall()
+        msg=""
         for i in rows:
-            await message.channel.send(f"{i[0]}: {i[1]}, Last msg posted on {i[2]}")
+            msg+=f"{i[0]}: {i[1]}, Last msg posted on {i[2]}"
+            msg+="\n"
+        await message.channel.send(msg)
 
     elif str(message.content)[:7] == "!msgcnt":
         username = message.mentions
