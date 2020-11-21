@@ -506,10 +506,10 @@ async def on_guild_update(before, after):
     conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
     print ("Opened database successfully")
     cur = conn.cursor()
-    cur.execute("UPDATE DISCORDBOT set CHANNEL = '%s' where server = '%s' " % (str(remove_quote_id(str(after.name),str(after.id)), str(remove_quote_id(str(before.guild),str(before.guild.id))))
+    cur.execute("UPDATE DISCORDBOT set CHANNEL = '%s' where server = '%s' " % (str(remove_quote_id(str(after.name),str(after.id)), str(remove_quote_id(str(before.guild),str(before.guild.id))))))
     print("channel is updated DISCORDBOT table")
     conn.commit()
-    cur.execute("UPDATE MESSAGES set CHANNEL = '%s' where server = '%s' " % (str(remove_quote_id(str(after.name),str(after.id)), str(remove_quote_id(str(before.guild),str(before.guild.id))))
+    cur.execute("UPDATE MESSAGES set CHANNEL = '%s' where server = '%s' " % (str(remove_quote_id(str(after.name),str(after.id)), str(remove_quote_id(str(before.guild),str(before.guild.id))))))
     print("channel is updated MESSAGES table")
     conn.commit()
     cur.close()
@@ -517,4 +517,3 @@ async def on_guild_update(before, after):
 
 
 client.run(config('token'))
-                                                                             
