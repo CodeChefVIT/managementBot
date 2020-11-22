@@ -527,4 +527,36 @@ async def on_guild_update(before, after):
     conn.close()
 
 
+# To update the role
+@client.event
+async def on_guild_role_update(before, after): 
+    conn = psycopg2.connect(database = config('database'), user = config('user'), password = config('password'), host = config('host'), port = config('port'))
+    print ("Opened database successfully")
+    cur = conn.cursor()
+    cur.execute("SELECT channel, username, userid, roles from DISCORDBOT where server='%s' " % (str(remove_quote_id(str(before.guild),str(before.guild.id)))))
+    rows = cur.fetchall()
+    for row in rows:
+        list_split=str(row[3]).split("!.#$%")
+        if str(before.name) in list_split:
+            index_list=list_split.index(before.name)
+            list_split[index_list]=str(after.name)                
+            cur.execute("UPDATE DISCORDBOT set roles = '%s' where username = '%s' and userid = '%s' and server = '%s' and channel = '%s' ;" % ("!.#$%".join(list_split), str(row[1]), str(row[2]), str(remove_quote_id(str(before.guild),str(before.guild.id))), str(row[0]))))
+            print("Rows with updated roles updated in MESSAGES table")
+            conn.commit()
+    conn.commit()
+
+    cur.execute("SELECT channel, msgid, roles from MESSAGES where server='%s' " % (str(remove_quote_id(str(before.guild),str(before.guild.id)))))
+    rows = cur.fetchall()
+    for row in rows:
+        list_split=str(row[2]).split("!.#$%")
+        if str(before.name) in list_split:
+            index_list=list_split.index(before.name)
+            list_split[index_list]=str(after.name)                
+            cur.execute("UPDATE MESSAGES set roles = '%s' where MSGID='%s' and server = '%s' and channel = '%s' ;" % ("!.#$%".join(list_split), str(row[1]), str(remove_quote_id(str(before.guild),str(before.guild.id))), str(row[0]))))
+            print("Rows with updated roles updated in MESSAGES table")
+            conn.commit()
+    conn.commit()
+    cur.close()
+    conn.close()
+
 client.run(config('token'))
