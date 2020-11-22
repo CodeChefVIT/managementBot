@@ -38,7 +38,7 @@ $ python3 bot.py
 ```
 
 ## Contributors
-- <a href="https://github.com/<Contributor>">Tanmay Bansal</a>
+- <a href="https://github.com/tanmayb104">Tanmay Bansal</a>
 
 ## License
 
