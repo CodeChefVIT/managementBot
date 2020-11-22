@@ -540,7 +540,7 @@ async def on_guild_role_update(before, after):
         if str(before.name) in list_split:
             index_list=list_split.index(before.name)
             list_split[index_list]=str(after.name)                
-            cur.execute("UPDATE DISCORDBOT set roles = '%s' where username = '%s' and userid = '%s' and server = '%s' and channel = '%s' ;" % ("!.#$%".join(list_split), str(row[1]), str(row[2]), str(remove_quote_id(str(before.guild),str(before.guild.id))), str(row[0]))))
+            cur.execute("UPDATE DISCORDBOT set roles = '%s' where username = '%s' and userid = '%s' and server = '%s' and channel = '%s' ;" % ("!.#$%".join(list_split), str(row[1]), str(row[2]), str(remove_quote_id(str(before.guild),str(before.guild.id))), str(row[0])))
             print("Rows with updated roles updated in MESSAGES table")
             conn.commit()
     conn.commit()
@@ -552,7 +552,7 @@ async def on_guild_role_update(before, after):
         if str(before.name) in list_split:
             index_list=list_split.index(before.name)
             list_split[index_list]=str(after.name)                
-            cur.execute("UPDATE MESSAGES set roles = '%s' where MSGID='%s' and server = '%s' and channel = '%s' ;" % ("!.#$%".join(list_split), str(row[1]), str(remove_quote_id(str(before.guild),str(before.guild.id))), str(row[0]))))
+            cur.execute("UPDATE MESSAGES set roles = '%s' where MSGID='%s' and server = '%s' and channel = '%s' ;" % ("!.#$%".join(list_split), str(row[1]), str(remove_quote_id(str(before.guild),str(before.guild.id))), str(row[0])))
             print("Rows with updated roles updated in MESSAGES table")
             conn.commit()
     conn.commit()
