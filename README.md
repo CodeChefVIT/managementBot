@@ -1,10 +1,10 @@
 <p align="center"><a href="http://www.codechefvit.com" target="_blank"><img src="https://s3.amazonaws.com/codechef_shared/sites/all/themes/abessive/logo-3.png" title="CodeChef-VIT" alt="Codechef-VIT"></a>
 </p>
 
-# Project Title
+# Management Bot
 
 > <Subtitle>
-> Include project description here.
+> Discord Bot for message management with features like: Message count per person, clear messages in chat, etc.
 
 ---
 [![DOCS](https://img.shields.io/badge/Documentation-see%20docs-green?style=flat-square&logo=appveyor)](INSERT_LINK_FOR_DOCS_HERE) 
@@ -14,7 +14,13 @@
 
 
 ## Features
-- Insert list of features here
+- Message count per person
+- Clear messages according to role of the person sent
+- Clear messages according to date sent
+- Sends an email when update is made to the webhooked github repo
+- Finds number of user in the server
+- Finds number of users online 
+- Gives the stats of roles assigned
 
 
 
@@ -25,15 +31,14 @@
 ## Instructions to run
 
 ```
-$ git clone https://github.com/CodeChefVIT/<Project>
-$ cd <Project>
+$ git clone https://github.com/CodeChefVIT/managementBot
+$ cd managementBot
 $ pip3 install -r requirements.txt
-$ python3 manage.py runserver
+$ python3 bot.py
 ```
 
 ## Contributors
-- <a href="https://github.com/<Contributor>">Contributor Name</a>
-- <a href="https://github.com/<Contributor>">Contributor Name</a>
+- <a href="https://github.com/<Contributor>">Tanmay Bansal</a>
 
 ## License
 
